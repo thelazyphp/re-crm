@@ -6,18 +6,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
-use App\HasOrg;
+use Laravel\Sanctum\HasApiTokens;
 use App\HasProfilePhoto;
-use App\HasScopes;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    use HasOrg;
     use HasProfilePhoto;
-    use HasScopes;
 
     /**
      * The accessors to append to the model's array form.
@@ -25,17 +21,6 @@ class User extends Authenticatable
      * @var array
      */
     protected $appends = ['profile_photo_url'];
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
-    protected $attributes = [
-        'owner' => false,
-        'scopes' => [],
-        'disabled' => false,
-    ];
 
     /**
      * The attributes that are mass assignable.
@@ -66,42 +51,6 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'owner' => 'boolean',
-        'scopes' => 'array',
-        'disabled' => 'boolean',
         'email_verified_at' => 'datetime',
     ];
-
-    public function org()
-    {
-        return $this->belongsTo('App\Models\Org');
-    }
-
-    /**
-     * @return void
-     */
-    public function enable()
-    {
-        $this->forceFill([
-            'disabled' => false,
-        ])->save();
-    }
-
-    /**
-     * @return void
-     */
-    public function disable()
-    {
-        $this->forceFill([
-            'disabled' => true,
-        ])->save();
-    }
-
-    /**
-     * @return void
-     */
-    public function toggleDisabled()
-    {
-        $this->disabled ? $this->enable() : $this->disable();
-    }
 }
