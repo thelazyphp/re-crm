@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\Team;
-use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -41,12 +40,6 @@ class RouteServiceProvider extends ServiceProvider
             return in_array($value, ['me', 'self', 'current'], true)
                 ? auth()->user()
                 : User::findOrFail($value);
-        });
-
-        Route::bind('team', function ($value) {
-            return $value === 'current'
-                ? auth()->user()->currentTeam
-                : Team::findOrFail($value);
         });
 
         $this->configureRateLimiting();

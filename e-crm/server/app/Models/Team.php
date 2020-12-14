@@ -19,7 +19,7 @@ class Team extends Model
     ];
 
     /**
-     * Get the owner of the team.
+     * Get the team's owner.
      */
     public function owner()
     {
@@ -33,6 +33,6 @@ class Team extends Model
      */
     public function members()
     {
-        return $this->belongsToMany(User::class);
+        return $this->hasMany(User::class);
     }
 }
