@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -37,7 +37,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         Route::bind('user', function ($value) {
-            return in_array($value, ['me', 'self', 'current'], true)
+            return $value === 'current'
                 ? auth()->user()
                 : User::findOrFail($value);
         });

@@ -12,7 +12,9 @@ trait HasProfilePhoto
      */
     public function getProfilePhotoUrlAttribute()
     {
-        return $this->profile_photo_path ? Storage::disk('public')->url($this->profile_photo_path) : null;
+        return $this->profile_photo_path
+            ? Storage::disk('public')->url($this->profile_photo_path)
+            : null;
     }
 
     /**
@@ -33,7 +35,7 @@ trait HasProfilePhoto
      */
     public function updateProfilePhoto(UploadedFile $photo)
     {
-        return tap($this->profile_photo_path, function ($previous) use ($photo) {
+        tap($this->profile_photo_path, function ($previous) use ($photo) {
             if ($previous) {
                 Storage::disk('public')->delete($previous);
             }

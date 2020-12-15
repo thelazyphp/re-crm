@@ -2,22 +2,18 @@
 
 namespace App\Models;
 
-use App\HasProfileCover;
 use App\HasProfilePhoto;
-use App\HasTeam;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
     use Notifiable;
-    use HasTeam;
-    use HasProfileCover;
     use HasProfilePhoto;
 
     /**
@@ -25,10 +21,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $appends = [
-        'profile_cover_url',
-        'profile_photo_url',
-    ];
+    protected $appends = ['profile_photo_url'];
 
     /**
      * The attributes that are mass assignable.
@@ -50,7 +43,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'profile_cover_path',
         'profile_photo_path',
     ];
 
