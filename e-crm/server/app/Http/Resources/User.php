@@ -16,6 +16,7 @@ class User extends JsonResource
     {
         return [
             'id' => $this->id,
+            'team' => $this->whenLoaded('team'),
             'profile_photo_url' => $this->profile_photo_url,
             'name' => $this->name,
             'last_name' => $this->last_name,

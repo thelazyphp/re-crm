@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\HasProfilePhoto;
+use App\HasTeam;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,6 +15,7 @@ class User extends Authenticatable
     use HasApiTokens;
     use HasFactory;
     use Notifiable;
+    use HasTeam;
     use HasProfilePhoto;
 
     /**
@@ -43,6 +45,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'team_id',
         'profile_photo_path',
     ];
 

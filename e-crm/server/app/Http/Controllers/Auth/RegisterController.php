@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,13 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $team = new Team();
+        $team->owner()->associate($user);
+        $team->save();
+
+        $user->team()->associate($team);
+        $user->save();
 
         if ($user instanceof MustVerifyEmail) {
             //
