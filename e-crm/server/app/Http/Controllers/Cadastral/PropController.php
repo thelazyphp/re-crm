@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 
 class PropController extends Controller
 {
+    public function __construct()
+    {
+        // $this->middleware('auth:api');
+        // $this->authorizeResource(Prop::class, 'prop');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,18 +27,66 @@ class PropController extends Controller
      */
     public function index(Request $request)
     {
+        $filter = (new QueryFilter())->withAllowedFilters([
+            'type_id',
+            'address.province_id',
+            'address.area_id',
+            'address.locality_id',
+            'function_id',
+            'entry_date',
+            'transaction_date',
+            'rooms',
+            'floor',
+            'capital_floors',
+            'size',
+            'land_size',
+            'pieces_after_transaction',
+            'price_usd',
+            'price_sqm_usd',
+        ])->withAllowedSorts([
+            'inventory_number',
+            'type_id',
+            'function_id',
+            'entry_date',
+            'transaction_date',
+            'rooms',
+            'floor',
+            'capital_floors',
+            'size',
+            'land_size',
+            'pieces_after_transaction',
+            'price_usd',
+            'price_sqm_usd',
+        ])->withSearchCallback(function (Builder $query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->whereHas('type', function (Builder $query) use ($search) {
+                    $query->where(
+                        'name',
+                        'like',
+                        '%'.$search.'%'
+                    );
+                });
+
+                $query->orWhereHas('address', function (Builder $query) use ($search) {
+                    $query->where(
+                        'full_address',
+                        'like',
+                        '%'.$search.'%'
+                    );
+                });
+
+                $query->orWhereHas('function', function (Builder $query) use ($search) {
+                    $query->where(
+                        'name',
+                        'like',
+                        '%'.$search.'%'
+                    );
+                });
+            });
+        });
+
         return new PropCollection(
-            (new QueryFilter())
-                ->withAllowedFilters([
-                    //
-                ])
-                ->withAllowedSorts([
-                    //
-                ])
-                ->withFilterCallback('', function (Builder $query, $column, $value) {
-                    //
-                })
-                ->filter(Prop::query(), $request)->paginate($request->query('per_page'))
+            $filter->apply(Prop::query(), $request)->paginate($request->query('per_page', 20))
         );
     }
 

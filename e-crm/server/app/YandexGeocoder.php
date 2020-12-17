@@ -5,7 +5,6 @@ namespace App;
 use App\Models\Address;
 use App\Models\AddressComponent;
 use App\Models\YandexGeocoderCache;
-use Illuminate\Database\Eloquent\Model;
 
 class YandexGeocoder
 {
@@ -42,25 +41,29 @@ class YandexGeocoder
 
     /**
      * @param  string  $geocode
-     * @param  \Illuminate\Database\Eloquent\Model|null  $addressable
+     * @param  string|null  $kind
      * @return \App\Models\Address|null
      */
-    public function getAddress($geocode, Model $addressable = null): ?Address
+    public function searchAddress($geocode, $kind = null): ?Address
     {
-        $response = $this->request($geocode);
+        $response = $this->request($geocode, $kind);
 
         if (
-            ! $response->response
+            ! $response
+                ->response
                 ->GeoObjectCollection
                 ->metaDataProperty
-                ->GeocoderResponseMetaData->found
+                ->GeocoderResponseMetaData
+                ->found
         ) {
             return null;
         }
 
-        $geoObject = $response->response
+        $geoObject = $response
+            ->response
             ->GeoObjectCollection
-            ->featureMember[0]->GeoObject;
+            ->featureMember[0]
+            ->GeoObject;
 
         $geocoderMetaData = $geoObject->metaDataProperty->GeocoderMetaData;
 
@@ -109,19 +112,23 @@ class YandexGeocoder
             $response = $this->request($lng.','.$lat, 'metro');
 
             if (
-                $response->response
+                $response
+                    ->response
                     ->GeoObjectCollection
                     ->metaDataProperty
-                    ->GeocoderResponseMetaData->found
+                    ->GeocoderResponseMetaData
+                    ->found
             ) {
                 foreach (
-                    $response->response
+                    $response
+                        ->response
                         ->GeoObjectCollection
                         ->featureMember[0]
                         ->GeoObject
                         ->metaDataProperty
                         ->GeocoderMetaData
-                        ->Address->Components as $component
+                        ->Address
+                        ->Components as $component
                 ) {
                     if (in_array($component->kind, ['route', 'metro'])) {
                         $components[$component->kind] = $component->name;
@@ -160,10 +167,6 @@ class YandexGeocoder
 
                 $address->{$kind.'_id'} = AddressComponent::firstOrCreate($attributes)->id;
             }
-        }
-
-        if (! is_null($addressable)) {
-            $addressable->address()->save($address);
         }
 
         return $address;

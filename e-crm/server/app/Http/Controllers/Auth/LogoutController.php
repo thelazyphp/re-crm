@@ -7,12 +7,19 @@ use Illuminate\Http\Request;
 
 class LogoutController extends Controller
 {
+    public function __construct()
+    {
+        // $this->middleware('auth:api');
+    }
+
     /**
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
+        $request->user()
+            ->token()
+            ->revoke();
     }
 }

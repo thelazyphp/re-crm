@@ -8,11 +8,19 @@ use Illuminate\Http\Request;
 class QueryFilter
 {
     /**
-     * @var string[]
+     * @var string
      */
-    protected $allowedFilters = [
-        //
-    ];
+    protected $searchParam = 'q';
+
+    /**
+     * @var string
+     */
+    protected $sortParam = 'sort';
+
+    /**
+     * @var string
+     */
+    protected $filterParam = 'filter';
 
     /**
      * @var string[]
@@ -24,14 +32,14 @@ class QueryFilter
     /**
      * @var string[]
      */
-    protected $allowedIncludes = [
+    protected $allowedFilters = [
         //
     ];
 
     /**
-     * @var array
+     * @var callable|null
      */
-    protected $filterCallbacks = [];
+    protected $searchCallback;
 
     /**
      * @var array
@@ -41,46 +49,35 @@ class QueryFilter
     /**
      * @var array
      */
-    protected $includeCallbacks = [];
-
-    /**
-     * @param  string[]  $filters
-     * @return self
-     */
-    public function withAllowedFilters($filters)
-    {
-        $this->allowedFilters = $filters;
-        return $this;
-    }
+    protected $filterCallbacks = [];
 
     /**
      * @param  string[]  $sorts
      * @return self
      */
-    public function withAllowedSorts($sorts)
+    public function withAllowedSorts(array $sorts)
     {
         $this->allowedSorts = $sorts;
         return $this;
     }
 
     /**
-     * @param  string[]  $includes
+     * @param  string[]  $filters
      * @return self
      */
-    public function withAllowedIncludes($includes)
+    public function withAllowedFilters(array $filters)
     {
-        $this->allowedIncludes = $includes;
+        $this->allowedFilters = $filters;
         return $this;
     }
 
     /**
-     * @param  string  $filter
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return self
      */
-    public function withFilterCallback($filter, callable $callback)
+    public function withSearchCallback(?callable $callback)
     {
-        $this->filterCallbacks[$filter] = $callback;
+        $this->searchCallback = $callback;
         return $this;
     }
 
@@ -96,13 +93,13 @@ class QueryFilter
     }
 
     /**
-     * @param  string  $include
+     * @param  string  $filter
      * @param  callable  $callback
      * @return self
      */
-    public function withIncludeCallback($include, callable $callback)
+    public function withFilterCallback($filter, callable $callback)
     {
-        $this->includeCallbacks[$include] = $callback;
+        $this->filterCallbacks[$filter] = $callback;
         return $this;
     }
 
@@ -111,52 +108,21 @@ class QueryFilter
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function filter(Builder $query, Request $request)
+    public function apply(Builder $query, Request $request)
     {
-        if ($request->filled('filter')) {
-            foreach ($request->filter as $column => $value) {
-                if (in_array($column, $this->allowedFilters)) {
-                    if (isset($this->filterCallbacks[$column])) {
-                        call_user_func(
-                            $this->filterCallbacks[$column], $query, $column, $value
-                        );
-                    } else {
-                        if (strpos($value, ',') !== false) {
-                            $value = explode(',', $value);
-                        }
-
-                        if (($pos = strrpos($column, '.')) !== false) {
-                            $relation = substr($column, 0, $pos);
-                            $column = substr($column, $pos + 1);
-
-                            $query->whereHas($relation, function (Builder $query) use ($column, $value) {
-                                if (is_array($value)) {
-                                    $query->whereIn(
-                                        $column, $value
-                                    );
-                                } else {
-                                    $query->where(
-                                        $column, '=', $value
-                                    );
-                                }
-                            });
-                        } elseif (is_array($value)) {
-                            $query->whereIn(
-                                $column, $value
-                            );
-                        } else {
-                            $query->where(
-                                $column, '=', $value
-                            );
-                        }
-                    }
-                }
+        if ($request->filled($this->searchParam)) {
+            if (! is_null($this->searchCallback)) {
+                call_user_func(
+                    $this->searchCallback,
+                    $query,
+                    $request->input($this->searchParam)
+                );
             }
         }
 
-        if ($request->filled('sort')) {
+        if ($request->filled($this->sortParam)) {
             $sorts = explode(
-                ',', $request->sort
+                ',', $request->input($this->sortParam)
             );
 
             foreach ($sorts as $column) {
@@ -170,7 +136,7 @@ class QueryFilter
                 if (in_array($column, $this->allowedSorts)) {
                     if (isset($this->sortCallbacks[$column])) {
                         call_user_func(
-                            $this->sortCallbacks[$column], $column, $order
+                            $this->sortCallbacks[$column], $query, $column, $order
                         );
                     } else {
                         $query->orderBy($column, $order);
@@ -179,22 +145,8 @@ class QueryFilter
             }
         }
 
-        if ($request->filled('include')) {
-            $includes = explode(
-                ',', $request->include
-            );
-
-            foreach ($includes as $include) {
-                if (in_array($include, $this->allowedIncludes)) {
-                    if (isset($this->includeCallbacks[$include])) {
-                        call_user_func(
-                            $this->includeCallbacks[$include], $include
-                        );
-                    } else {
-                        $query->with($include);
-                    }
-                }
-            }
+        if ($request->filled($this->filterParam)) {
+            //
         }
 
         return $query;

@@ -6,11 +6,16 @@ use App\Http\Filters\QueryFilter;
 use App\Http\Resources\AddressComponent as AddressComponentResource;
 use App\Http\Resources\AddressComponentCollection;
 use App\Models\AddressComponent;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AddressComponentController extends Controller
 {
+    public function __construct()
+    {
+        // $this->middleware('auth:api');
+        // $this->authorizeResource(AddressComponent::class, 'addressComponent');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,22 +24,22 @@ class AddressComponentController extends Controller
      */
     public function index(Request $request)
     {
+        $filter = (new QueryFilter())->withAllowedFilters([
+            'kind',
+            'country_id',
+            'province_id',
+            'area_id',
+            'locality_id',
+            'district_id',
+            'route_id',
+            'metro_id',
+            'street_id',
+            'house_id',
+            'entrance_id',
+        ]);
+
         return new AddressComponentCollection(
-            (new QueryFilter())
-                ->withAllowedFilters([
-                    'kind',
-                    'country_id',
-                    'province_id',
-                    'area_id',
-                    'locality_id',
-                    'district_id',
-                    'route_id',
-                    'metro_id',
-                    'street_id',
-                    'house_id',
-                    'entrance_id',
-                ])
-                ->filter(AddressComponent::query(), $request)->get()
+            $filter->apply(AddressComponent::query(), $request)->orderBy('name')->get()
         );
     }
 

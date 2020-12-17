@@ -19,7 +19,7 @@ class Team extends Model
     ];
 
     /**
-     * Get the team owner.
+     * Get the owner of the team.
      */
     public function owner()
     {
@@ -29,7 +29,7 @@ class Team extends Model
     }
 
     /**
-     * Get the team members.
+     * Get the members of the team.
      */
     public function members()
     {

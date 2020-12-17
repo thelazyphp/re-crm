@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Cadastral;
 
+use App\Http\Resources\Address;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class Prop extends JsonResource
@@ -16,10 +17,10 @@ class Prop extends JsonResource
     {
         return [
             'id' => $this->id,
-            'address' => $this->whenLoaded('address'),
-            'type' => $this->whenLoaded('type'),
+            'address' => new Address($this->whenLoaded('address')),
+            'type' => new PropComponent($this->whenLoaded('type')),
             'inventory_number' => $this->inventory_number,
-            'function' => $this->whenLoaded('function'),
+            'function' => new PropComponent($this->whenLoaded('function')),
             'function_description' => $this->function_description,
             'name' => $this->name,
             'size' => $this->size,

@@ -24,11 +24,8 @@ class RegisterController extends Controller
         ]);
 
         $team = new Team();
-        $team->owner()->associate($user);
-        $team->save();
 
-        $user->team()->associate($team);
-        $user->save();
+        $team->owner()->associate($user)->members()->save($user);
 
         if ($user instanceof MustVerifyEmail) {
             //

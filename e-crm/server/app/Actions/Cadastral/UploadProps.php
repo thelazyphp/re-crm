@@ -229,7 +229,11 @@ class UploadProps
                 ], $attributes);
 
                 if (isset($row[3])) {
-                    $geocoder->getAddress(trim($row[3]), $prop);
+                    $address = $geocoder->searchAddress(trim($row[3]));
+
+                    if (! is_null($address)) {
+                        $prop->address()->save($address);
+                    }
                 }
             } catch (Throwable $e) {
                 //

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 trait HasAddress
 {
     /**
-     * Get the model address.
+     * Get the address of the model.
      */
     public function address(): MorphOne
     {

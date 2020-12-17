@@ -4,6 +4,7 @@ use App\Http\Controllers\AddressComponentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Cadastral\PropComponentController;
 use App\Http\Controllers\Cadastral\PropController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [RegisterController::class, 'register'])->name('register');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
-Route::apiResource('address-components', AddressComponentController::class)->only(['index', 'show']);
+Route::middleware('auth:api')->apiResource('address-components', AddressComponentController::class)->only(['index', 'show']);
 Route::middleware('auth:api')->post('/logout', [LogoutController::class, 'logout'])->name('logout');
 Route::middleware('auth:api')->apiResource('users', UserController::class);
 Route::middleware('auth:api')->apiResource('cadastral/props', PropController::class)->only(['index', 'store', 'show']);
+Route::middleware('auth:api')->apiResource('cadastral/prop-components', PropComponentController::class)->only(['index', 'show']);
