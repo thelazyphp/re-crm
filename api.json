@@ -1,0 +1,96 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "path": "/user"
+        },
+        {
+            "method": "PATCH",
+            "path": "/user"
+        },
+        {
+            "method": "GET",
+            "path": "/user/orgs"
+        },
+        {
+            "method": "GET",
+            "path": "/users"
+        },
+        {
+            "method": "GET",
+            "path": "/users/{username}"
+        },
+        {
+            "method": "GET",
+            "path": "/users/{username}/orgs"
+        },
+        {
+            "method": "POST",
+            "path": "/users/{username}/orgs"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}"
+        },
+        {
+            "method": "PATCH",
+            "path": "/orgs/{org}"
+        },
+        {
+            "method": "DELETE",
+            "path": "/orgs/{org}"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/owner"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/owner/{username}"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/members"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/members/{username}"
+        },
+        {
+            "method": "DELETE",
+            "path": "/orgs/{org}/members/{username}"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/invitations"
+        },
+        {
+            "method": "POST",
+            "path": "/orgs/{org}/invitations"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/invitations/{invitation}"
+        },
+        {
+            "method": "DELETE",
+            "path": "/orgs/{org}/invitations/{invitation}"
+        },
+        {
+            "method": "GET",
+            "path": "/orgs/{org}/memberships/{username}"
+        },
+        {
+            "method": "PUT",
+            "path": "/orgs/{org}/memberships/{username}"
+        },
+        {
+            "method": "DELETE",
+            "path": "/orgs/{org}/memberships/{username}"
+        }
+    ]
+}
