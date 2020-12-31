@@ -1,0 +1,121 @@
+{
+    "language": "Русский (Россия)",
+    "errors": {
+        "invalid_credentials": "Неверный E-Mail или пароль!",
+        "get_current_user_error": "Ошибка получения данных о текущем пользователе!",
+        "sign_in_error": "Ошибка входа!",
+        "sign_up_error": "Ошибка регистрации!",
+        "sign_out_error": "Ошибка выхода!",
+        "edit_profile_error": "Ошибка редактирования профиля!",
+        "delete_account_error": "Ошибка удаления аккаунта!"
+    },
+    "messages": {
+        "signed_in": "Вы вошли в аккаунт.",
+        "signed_up": "Вы зарегистрировали аккаунт.",
+        "profile_edited": "Профиль успешно отредактирован.",
+        "account_deleted": "Аккаунт успешно удален."
+    },
+    "components": {
+        "nav_item": {
+            "current": "текущая"
+        },
+        "alert": {
+            "close": "Закрыть"
+        },
+        "header": {
+            "toggle_navigation": "Переключить навигацию",
+            "update": "Обновить",
+            "feeds": "Фиды",
+            "bots": "Боты",
+            "logs": "Логи",
+            "profile": "Профиль",
+            "sign_in": "Войти",
+            "sign_out": "Выйти"
+        },
+        "update_upload": {
+            "uploading": "Загрузка",
+            "updating": "Обновление"
+        },
+        "feed": {
+            "generating": "Генерация",
+            "open_in_new_tab": "Открыть в новой вкладке",
+            "generated_at": "Генерировался",
+            "not_generated_yet": "Пока не генерировался"
+        },
+        "bot": {
+            "run_at": "Запускался",
+            "not_run_yet": "Пока не запускался"
+        }
+    },
+    "buttons": {
+        "browse": "Открыть",
+        "remove": "Удалить",
+        "remove_all": "Удалить все",
+        "upload": "Загрузить",
+        "upload_all": "Загрузить все",
+        "generate": "Генерировать",
+        "generate_all": "Генерировать все",
+        "run": "Запустить",
+        "sign_in": "Войти",
+        "sign_up": "Зарегистрироваться",
+        "edit_profile": "Редактировать профиль",
+        "delete_account": "Удалить аккаунт"
+    },
+    "pages": {
+        "login": {
+            "not_registered_yet": "Еще не зарегистрированы?",
+            "register_account": "Зарегистрировать аккаунт.",
+            "sign_in": "Вход",
+            "email": "E-Mail",
+            "password": "Пароль"
+        },
+        "register": {
+            "already_registered": "Уже зарегистрированы?",
+            "sign_in_account": "Войти в аккаунт.",
+            "sign_up": "Регистрация",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "email": "E-Mail",
+            "password": "Пароль",
+            "confirm_password": "Подтвердите пароль"
+        },
+        "home": {
+            "welcome": "Добро пожаловать!"
+        },
+        "update": {
+            "update": "Обновление",
+            "choose_files": "Выберите файлы"
+        },
+        "feeds": {
+            "feeds": "Фиды"
+        },
+        "bots": {
+            "bots": "Боты"
+        },
+        "logs": {
+            "logs": "Логи",
+            "bots": "Боты",
+            "jandex_geolocations": "Геолокации Jandex"
+        },
+        "profile": {
+            "profile": "Профиль",
+            "id": "ID",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "email": "E-Mail"
+        },
+        "profile_edit": {
+            "edit_profile": "Редактирование профиля",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "email": "E-Mail",
+            "password": "Пароль",
+            "new_password": "Новый пароль",
+            "confirm_password": "Подтвердите пароль"
+        },
+        "account_delete": {
+            "delete_account": "Удаление аккаунта",
+            "type": "Введите"
+        }
+    }
+}
