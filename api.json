@@ -50,10 +50,6 @@
         },
         {
             "method": "GET",
-            "path": "/orgs/{org}/owner/{username}"
-        },
-        {
-            "method": "GET",
             "path": "/orgs/{org}/members"
         },
         {
