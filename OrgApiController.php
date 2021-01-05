@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invitation;
 use App\Models\Org;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,18 +14,17 @@ class OrgApiController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        Validator::make(request()->query(), [
+        Validator::make($request->query(), [
             'page'      => 'integer|min:1',
             'per_page'  => 'integer|min:1|max:100',
         ])->validate();
 
-        return Org::paginate(
-            request()->query('per_page', 25)
-        );
+        return Org::paginate($request->query('per_page', 25));
     }
 
     /**
@@ -97,19 +97,85 @@ class OrgApiController extends Controller
     }
 
     /**
+     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Org  $org
      * @return \Illuminate\Http\Response
      */
-    public function members(Org $org)
+    public function invitations(Request $request, Org $org)
     {
-        Validator::make(request()->query(), [
+        Validator::make($request->query(), [
             'page'      => 'integer|min:1',
             'per_page'  => 'integer|min:1|max:100',
         ])->validate();
 
-        return $org->members()->paginate(
-            request()->query('per_page', 25)
-        );
+        return $org->invitations()->paginate($request->query('per_page', 25));
+    }
+
+    /**
+     * @param  \App\Models\Org  $org
+     * @param  \App\Models\Invitation  $invitation
+     * @return \Illuminate\Http\Response
+     */
+    public function showInvitations(Org $org, Invitation $invitation)
+    {
+        return $invitation->load(['org', 'inviter']);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Org  $org
+     * @return \Illuminate\Http\Response
+     */
+    public function createInvitation(Request $request, Org $org)
+    {
+        $request->validate([
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        do {
+            $token = Str::random(34);
+        } while (Invitation::where('token', $token)->first());
+
+        return Invitation::create([
+            'org_id' => $org->id,
+            'inviter_id' => auth()->id(),
+            'email' => $request->email,
+            'token' => $request->token,
+        ]);
+    }
+
+    /**
+     * @param  \App\Models\Org  $org
+     * @param  \App\Models\Invitation  $invitation
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyInvitation(Org $org, Invitation $invitation)
+    {
+        $invitation->delete();
+
+        return response('', 204);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Org  $org
+     * @return \Illuminate\Http\Response
+     */
+    public function members(Request $request, Org $org)
+    {
+        Validator::make($request->query(), [
+            'role'      => 'string|in:owner,admin,memeber',
+            'page'      => 'integer|min:1',
+            'per_page'  => 'integer|min:1|max:100',
+        ])->validate();
+
+        $members = $org->members();
+
+        if ($request->query('role')) {
+            $members->wherePivot('role', $request->query('role'));
+        }
+
+        return $members->paginate($request->query('per_page', 25));
     }
 
     /**
@@ -125,6 +191,23 @@ class OrgApiController extends Controller
     }
 
     /**
+     * @param  \App\Models\Org  $org
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function showMembership(Org $org, User $user)
+    {
+        if (! $org->members->contains($user)) {
+            abort(404);
+        }
+
+        return $org->members()
+            ->where('id', $user->id)
+            ->get()
+            ->membership;
+    }
+
+    /**
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Org  $org
      * @param  \App\Models\User  $user
@@ -132,6 +215,10 @@ class OrgApiController extends Controller
      */
     public function updateMembership(Request $request, Org $org, User $user)
     {
+        if (! $org->members->contains($user)) {
+            abort(404);
+        }
+
         $input = $request->validate([
             'role' => 'string|in:admin,member',
         ]);
@@ -148,6 +235,10 @@ class OrgApiController extends Controller
      */
     public function destroyMembership(Org $org, User $user)
     {
+        if (! $org->members->contains($user)) {
+            abort(404);
+        }
+
         $org->members()->detach($user);
 
         return response('', 204);
