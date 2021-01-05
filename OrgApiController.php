@@ -116,7 +116,7 @@ class OrgApiController extends Controller
      * @param  \App\Models\Invitation  $invitation
      * @return \Illuminate\Http\Response
      */
-    public function showInvitations(Org $org, Invitation $invitation)
+    public function showInvitation(Org $org, Invitation $invitation)
     {
         return $invitation->load(['org', 'inviter']);
     }
