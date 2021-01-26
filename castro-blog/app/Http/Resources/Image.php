@@ -16,8 +16,11 @@ class Image extends JsonResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'url' => $this->url,
+            'attach_to_home_page' => $this->attach_to_home_page,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

@@ -18,12 +18,23 @@ class Image extends Model
     protected $appends = ['url'];
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'attach_to_home_page' => false,
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
+        'name',
         'path',
+        'attach_to_home_page',
     ];
 
     /**
@@ -35,13 +46,17 @@ class Image extends Model
         'path',
     ];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'attach_to_home_page' => 'boolean',
+    ];
+
     public function getUrlAttribute()
     {
         return Storage::disk('public')->url($this->path);
-    }
-
-    public function imageable()
-    {
-        return $this->morphTo();
     }
 }

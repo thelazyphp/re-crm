@@ -14,7 +14,10 @@ const mix = require('laravel-mix');
 mix.setResourceRoot('/castro-blog/');
 
 mix.js('resources/js/entry-client.js', 'public/js').vue()
-mix.js('resources/js/entry-server.js', 'public/js').vue()
-    .postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
+    .js('resources/js/entry-server.js', 'public/js').vue()
+    .js('resources/js/admin/app.js', 'public/js/admin').vue()
+    .sass('resources/css/app.scss', 'public/css')
+    .sass('resources/css/admin/app.scss', 'public/css/admin');
+    // .postCss('resources/css/app.css', 'public/css', [
+    //     //
+    // ]);

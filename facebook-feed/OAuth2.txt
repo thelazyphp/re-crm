@@ -1,7 +1,0 @@
-Personal access client:
-    Client ID: 1
-    Client secret: Te52mkBYd9KWlSOZWvJW8EcwIErKj0Ofrp2hj9t5
-
-Password grant client:
-    Client ID: 2
-    Client secret: n1AgV4ecgdXctVhvFuRwerZIcwK2KOlCBllzuXxZ

@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\API\Auth\LoginController;
-use App\Http\Controllers\API\Auth\LogoutController;
+use App\Http\Controllers\API\CurrentUserController;
+use App\Http\Controllers\API\ImageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,5 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', LoginController::class);
-Route::middleware('auth:sanctum')->post('/logout', LogoutController::class);
+Route::apiResource('images', ImageController::class);
+
+Route::middleware('auth:sanctum')->get('/user', [CurrentUserController::class, 'show']);
+Route::middleware('auth:sanctum')->patch('/user', [CurrentUserController::class, 'update']);
+Route::middleware('auth:sanctum')->patch('/user/profile-photo', [CurrentUserController::class, 'updateProfilePhoto']);
+Route::middleware('auth:sanctum')->delete('/user/profile-photo', [CurrentUserController::class, 'destroyProfilePhoto']);

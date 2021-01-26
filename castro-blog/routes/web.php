@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AppController;
+use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,4 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/{any?}', 'app')->where('any', '.*');
+Route::get('/admin/{path?}', [AdminController::class, 'index'])->where('path', '.*');
+Route::get('/{path?}', [AppController::class, 'index'])->where('path', '.*');
+Route::post('/login', [LoginController::class, 'login']);
+Route::middleware('auth')->post('/logout', [LoginController::class, 'logout']);
