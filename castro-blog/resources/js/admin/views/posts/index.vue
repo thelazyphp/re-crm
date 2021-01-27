@@ -35,7 +35,7 @@
                                         class="text-nowrap"
                                     >
                                         <td
-                                            colspan="4"
+                                            colspan="7"
                                             class="text-center"
                                         >
                                             Постов не найдено
