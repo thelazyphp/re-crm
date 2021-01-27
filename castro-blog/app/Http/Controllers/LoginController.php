@@ -17,13 +17,15 @@ class LoginController extends Controller
 
         $credentials = $request->only(
             'email',
-            'password',
+            'password'
         );
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
         } else {
-            throw ValidationException::withMessages(['email' => __('auth.failed')]);
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
         }
     }
 

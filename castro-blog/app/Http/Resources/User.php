@@ -14,14 +14,22 @@ class User extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->id,
-            'profile_photo_url' => $this->profile_photo_url,
-            'name' => $this->name,
-            'email' => $this->email,
-            'email_verified' => (bool) $this->email_verified_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
+        if ($request->user()) {
+            return [
+                'id' => $this->id,
+                'profile_photo_url' => $this->profile_photo_url,
+                'name' => $this->name,
+                'email' => $this->email,
+                'email_verified' => (bool) $this->email_verified_at,
+                'created_at' => $this->created_at,
+                'updated_at' => $this->updated_at,
+            ];
+        } else {
+            return [
+                'id' => $this->id,
+                'profile_photo_url' => $this->profile_photo_url,
+                'name' => $this->name,
+            ];
+        }
     }
 }

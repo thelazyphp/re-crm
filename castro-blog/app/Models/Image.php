@@ -23,7 +23,7 @@ class Image extends Model
      * @var array
      */
     protected $attributes = [
-        'attach_to_home_page' => false,
+        'published' => false,
     ];
 
     /**
@@ -34,7 +34,7 @@ class Image extends Model
     protected $fillable = [
         'name',
         'path',
-        'attach_to_home_page',
+        'published',
     ];
 
     /**
@@ -52,7 +52,7 @@ class Image extends Model
      * @var array
      */
     protected $casts = [
-        'attach_to_home_page' => 'boolean',
+        'published' => 'boolean',
     ];
 
     public function getUrlAttribute()

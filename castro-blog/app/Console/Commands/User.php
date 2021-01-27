@@ -53,6 +53,7 @@ class User extends Command
             if (!$email) {
                 $this->error('The email is required!');
             } elseif (UserModel::where('email', $email)->exists()) {
+                $email = '';
                 $this->error('The email is already taken!');
             }
         } while (!$email);
@@ -61,7 +62,7 @@ class User extends Command
             $password = $this->ask('Password');
 
             if (!$password) {
-                $this->secret('The password is required!');
+                $this->error('The password is required!');
             }
         } while (!$password);
 

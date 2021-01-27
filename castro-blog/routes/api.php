@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\API\CurrentUserController;
+use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ImageController;
+use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,9 +17,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::apiResource('categories', CategoryController::class);
 Route::apiResource('images', ImageController::class);
+Route::apiResource('posts', PostController::class);
 
-Route::middleware('auth:sanctum')->get('/user', [CurrentUserController::class, 'show']);
-Route::middleware('auth:sanctum')->patch('/user', [CurrentUserController::class, 'update']);
-Route::middleware('auth:sanctum')->patch('/user/profile-photo', [CurrentUserController::class, 'updateProfilePhoto']);
-Route::middleware('auth:sanctum')->delete('/user/profile-photo', [CurrentUserController::class, 'destroyProfilePhoto']);
+Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'current']);

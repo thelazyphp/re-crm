@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
@@ -56,5 +57,29 @@ class User extends Authenticatable
         return is_null($this->profile_photo_path)
             ? null
             : Storage::disk('public')->url($this->profile_photo_path);
+    }
+
+    public function deleteProfilePhoto()
+    {
+        Storage::disk('public')->delete($this->profile_photo_path);
+
+        $this->forceFill([
+            'profile_photo_path' => null,
+        ])->save();
+    }
+
+    public function updateProfilePhoto(UploadedFile $photo)
+    {
+        tap($this->profile_photo_path, function ($previous) use ($photo) {
+            $this->forceFill([
+                'profile_photo_path' => $photo->storePublicly('profile-photos', [
+                    'disk' => 'public',
+                ]),
+            ])->save();
+
+            if ($previous) {
+                Storage::disk('public')->delete($previous);
+            }
+        });
     }
 }

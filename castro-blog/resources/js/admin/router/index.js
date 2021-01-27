@@ -4,8 +4,10 @@ import store from '../store';
 import DefaultLayout from '../components/layouts/Default.vue';
 import AuthLayout from '../components/layouts/Auth.vue';
 import Photos from '../views/Photos.vue';
-import Posts from '../views/Posts.vue';
-import Categories from '../views/Categories.vue';
+import Posts from '../views/posts';
+import Categories from '../views/categories';
+import CategoriesCreate from '../views/categories/Create.vue';
+import CategoriesEdit from '../views/categories/Edit.vue';
 import NotFound from '../views/NotFound.vue';
 import Login from '../views/Login.vue';
 
@@ -42,6 +44,24 @@ const routes = [
                 meta: {
                     auth: true,
                     pageTitle: 'Категории'
+                }
+            },
+            {
+                path: 'categories/create',
+                name: 'categories.create',
+                component: CategoriesCreate,
+                meta: {
+                    auth: true,
+                    pageTitle: 'Создать категорию'
+                }
+            },
+            {
+                path: 'categories/:id/edit',
+                name: 'categories.edit',
+                component: CategoriesEdit,
+                meta: {
+                    auth: true,
+                    pageTitle: 'Редактировать категорию'
                 }
             },
             {
@@ -84,18 +104,18 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if (to.meta.auth && !store.state.isAuth) {
         next('/login');
+    } else {
+        next();
     }
-
-    next();
 });
 
 router.beforeEach(async (to, from, next) => {
     if (store.state.isAuth && !store.state.user) {
         await store.dispatch('fetchUser');
         next();
+    } else {
+        next();
     }
-
-    next();
 });
 
 router.beforeEach((to, from, next) => {
@@ -103,9 +123,11 @@ router.beforeEach((to, from, next) => {
         Vue.nextTick(function () {
             document.title = `${to.meta.pageTitle} | Castro Blog`;
         });
-    }
 
-    next();
+        next();
+    } else {
+        next();
+    }
 });
 
 export default router;

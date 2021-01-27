@@ -4,12 +4,21 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Image as ImageResource;
+use App\Models\Category;
 use App\Models\Image;
+use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(
+            'index',
+            'show',
+        );
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -31,13 +40,17 @@ class ImageController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => ['required', 'image'],
+            'image' => ['required', 'file', 'image', 'max:51200'],
+        ]);
+
+        $path = $request->file('image')->storePublicly('images', [
+            'disk' => 'public',
         ]);
 
         return new ImageResource(
             Image::create([
                 'name' => $request->file('image')->getClientOriginalName(),
-                'path' => $request->file('image')->storePublicly('images', ['disk' => 'public']),
+                'path' => $path,
             ])
         );
     }
@@ -62,14 +75,14 @@ class ImageController extends Controller
      */
     public function update(Request $request, Image $image)
     {
-        return new ImageResource(
-            $image->fill(
-                $request->validate([
-                    'name' => ['string'],
-                    'attach_to_home_page' => ['boolean'],
-                ])
-            )
-        );
+        $input = $request->validate([
+            'name' => ['filled', 'string'],
+            'published' => ['boolean'],
+        ]);
+
+        $image->update($input);
+
+        return new ImageResource($image);
     }
 
     /**
@@ -80,7 +93,14 @@ class ImageController extends Controller
      */
     public function destroy(Image $image)
     {
-        Storage::disk('public')->delete($image->path);
+        Post::where('image_id', $image->id)->update([
+            'image_id' => null,
+        ]);
+
+        Category::where('image_id', $image->id)->update([
+            'image_id' => null,
+        ]);
+
         $image->delete();
 
         return response(null, 204);
