@@ -61,9 +61,10 @@ export default {
 	computed: {
 		links () {
 			return [
-				{ id: 1, path: '/photos', text: 'Фото', icon: 'fas fa-fw fa-folder' },
-				{ id: 2, path: '/posts', text: 'Посты', icon: 'fas fa-fw fa-folder' },
-				{ id: 3, path: '/categories', text: 'Категории', icon: 'fas fa-fw fa-folder' },
+                { id: 1, path: '/blog', text: 'Блог', icon: 'fas fa-fw fa-folder' },
+				{ id: 2, path: '/photos', text: 'Фото', icon: 'fas fa-fw fa-folder' },
+				{ id: 3, path: '/posts', text: 'Посты', icon: 'fas fa-fw fa-folder' },
+				{ id: 4, path: '/categories', text: 'Категории', icon: 'fas fa-fw fa-folder' },
 			];
 		}
 	}

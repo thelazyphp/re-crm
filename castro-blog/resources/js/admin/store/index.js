@@ -32,6 +32,8 @@ export default new Vuex.Store({
                 const { data } = await axios.get('/api/user');
                 commit(SET_USER, data.data);
             } catch (error) {
+                //
+
                 console.log(error);
             }
         }

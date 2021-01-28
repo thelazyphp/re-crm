@@ -20,6 +20,7 @@ class Category extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'published' => $this->published,
+            'posts_count' => $this->posts_count,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <h1 class="h3 mb-4 text-gray-800">
-            Создать категорию
+            Создать пост
         </h1>
         <div class="row">
             <div class="col">
@@ -47,23 +47,75 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="name">
-                                        Название
+                                    <label for="category">
+                                        Категория
+                                    </label>
+
+                                    <select
+                                        id="category"
+                                        v-model="form.data.category_id"
+                                        class="custom-select"
+                                        :class="{ 'is-invalid': form.errors.category_id.length > 0 }"
+                                    >
+                                        <option :value="null">
+                                            Без категории
+                                        </option>
+
+                                        <option
+                                            v-for="category in categories"
+                                            :key="category.id"
+                                            :value="category.id"
+                                        >
+                                            {{ category.name }}
+                                        </option>
+                                    </select>
+
+                                    <div
+                                        v-if="form.errors.category_id.length > 0"
+                                        class="invalid-feedback"
+                                    >
+                                        {{ form.errors.category_id[0] }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="title">
+                                        Заголовок
                                     </label>
 
                                     <input
-                                        id="name"
-                                        v-model="form.data.name"
+                                        id="title"
+                                        v-model="form.data.title"
                                         type="text"
                                         class="form-control"
-                                        :class="{ 'is-invalid': form.errors.name.length > 0 }"
+                                        :class="{ 'is-invalid': form.errors.title.length > 0 }"
                                     />
 
                                     <div
-                                        v-if="form.errors.name.length > 0"
+                                        v-if="form.errors.title.length > 0"
                                         class="invalid-feedback"
                                     >
-                                        {{ form.errors.name[0] }}
+                                        {{ form.errors.title[0] }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="body">
+                                        Текст
+                                    </label>
+
+                                    <textarea
+                                        id="body"
+                                        v-model="form.data.body"
+                                        type="text"
+                                        class="form-control"
+                                        :class="{ 'is-invalid': form.errors.body.length > 0 }"
+                                    >
+                                    </textarea>
+
+                                    <div
+                                        v-if="form.errors.body.length > 0"
+                                        class="invalid-feedback"
+                                    >
+                                        {{ form.errors.body[0] }}
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -157,7 +209,7 @@ import axios from 'axios';
 import PhotosDialog from '../../components/PhotosDialog.vue';
 
 export default {
-    name: 'CategoriesCreatePage',
+    name: 'PostsCreatePage',
 
     components: {
         PhotosDialog
@@ -166,16 +218,21 @@ export default {
     data () {
         return {
             chosenPhoto: null,
+            categories: [],
             form: {
                 loading: false,
                 data: {
+                    category_id: null,
                     image_id: null,
-                    name: '',
+                    title: '',
+                    body: '',
                     published: false
                 },
                 errors: {
+                    category_id: [],
                     image_id: [],
-                    name: [],
+                    title: [],
+                    body: [],
                     published: []
                 }
             }
@@ -190,11 +247,27 @@ export default {
         }
     },
 
+    async created () {
+        await this.fetchCategories();
+    },
+
     mounted () {
-        document.getElementById('name').focus();
+        document.getElementById('title').focus();
+        window.tinymce.init({selector:'#body'});
     },
 
     methods: {
+        async fetchCategories () {
+            try {
+                const { data } = await axios.get('/api/categories');
+                this.categories = data.data;
+            } catch (error) {
+                //
+
+                console.log(error);
+            }
+        },
+
         closeModal () {
             window.$('#photosDialogModal').modal('hide');
         },
@@ -209,9 +282,11 @@ export default {
             this.clearFormErrors();
             this.form.loading = true;
 
+            this.form.data.body = window.tinymce.activeEditor.getContent();
+
             try {
-                await axios.post('/api/categories', this.form.data);
-                this.$router.push('/categories');
+                await axios.post('/api/posts', this.form.data);
+                this.$router.push('/posts');
             } catch (error) {
                 console.log(error);
                 if (typeof error.response !== 'undefined') {

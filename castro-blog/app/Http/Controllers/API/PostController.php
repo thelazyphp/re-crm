@@ -15,7 +15,7 @@ class PostController extends Controller
     {
         $this->middleware('auth:sanctum')->except(
             'index',
-            'show',
+            'show'
         );
     }
 
@@ -26,8 +26,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        return new PostResource(
-            Post::paginate()
+        return PostResource::collection(
+            Post::all()
         );
     }
 

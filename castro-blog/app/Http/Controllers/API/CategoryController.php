@@ -16,7 +16,7 @@ class CategoryController extends Controller
     {
         $this->middleware('auth:sanctum')->except(
             'index',
-            'show',
+            'show'
         );
     }
 
@@ -28,7 +28,7 @@ class CategoryController extends Controller
     public function index()
     {
         return CategoryResource::collection(
-            Category::paginate()
+            Category::withCount('posts')->get()
         );
     }
 

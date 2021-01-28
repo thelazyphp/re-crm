@@ -1,24 +1,36 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '../store';
-import DefaultLayout from '../components/layouts/Default.vue';
 import AuthLayout from '../components/layouts/Auth.vue';
+import DefaultLayout from '../components/layouts/Default.vue';
+import Login from '../views/Login.vue';
+import NotFound from '../views/NotFound.vue';
+import Blog from '../views/Blog.vue';
 import Photos from '../views/Photos.vue';
 import Posts from '../views/posts';
+import PostsEdit from '../views/posts/Edit.vue';
+import PostsCreate from '../views/posts/Create.vue';
 import Categories from '../views/categories';
-import CategoriesCreate from '../views/categories/Create.vue';
 import CategoriesEdit from '../views/categories/Edit.vue';
-import NotFound from '../views/NotFound.vue';
-import Login from '../views/Login.vue';
+import CategoriesCreate from '../views/categories/Create.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
     {
         path: '/',
-        redirect: '/photos',
+        redirect: '/blog',
         component: DefaultLayout,
         children: [
+            {
+                path: 'blog',
+                name: 'blog',
+                component: Blog,
+                meta: {
+                    auth: true,
+                    pageTitle: 'Блог'
+                }
+            },
             {
                 path: 'photos',
                 name: 'photos',
@@ -35,6 +47,24 @@ const routes = [
                 meta: {
                     auth: true,
                     pageTitle: 'Посты'
+                }
+            },
+            {
+                path: 'posts/create',
+                name: 'posts.create',
+                component: PostsCreate,
+                meta: {
+                    auth: true,
+                    pageTitle: 'Создать пост'
+                }
+            },
+            {
+                path: 'posts/:id/edit',
+                name: 'posts.edit',
+                component: PostsEdit,
+                meta: {
+                    auth: true,
+                    pageTitle: 'Редактировать пост'
                 }
             },
             {

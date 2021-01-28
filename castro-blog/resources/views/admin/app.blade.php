@@ -19,6 +19,8 @@
                 font-family: 'Nunito' !important;
             }
         </style>
+
+        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     </head>
     <body>
         <div id="app"></div>

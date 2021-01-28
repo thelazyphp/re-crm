@@ -7,6 +7,8 @@ import store from './store';
 import router from './router';
 import App from './components/App.vue';
 
+Vue.config.productionTip = false;
+
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = 'http://localhost/castro-blog';
 

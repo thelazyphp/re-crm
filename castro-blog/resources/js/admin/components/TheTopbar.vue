@@ -41,6 +41,7 @@
 import axios from 'axios';
 
 import {
+    SET_USER,
     SET_IS_AUTH,
 } from '../store/mutation-types';
 
@@ -58,9 +59,12 @@ export default {
             try {
                 await axios.get('/sanctum/csrf-cookie');
                 await axios.post('/logout');
+                this.$store.commit(SET_USER, null);
                 this.$store.commit(SET_IS_AUTH, false);
                 this.$router.push('/login');
             } catch (error) {
+                //
+
                 console.log(error);
             }
         }

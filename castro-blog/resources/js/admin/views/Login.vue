@@ -91,8 +91,9 @@ export default {
 
     methods: {
         clearFormErrors () {
-            this.form.errors.email = [];
-            this.form.errors.password = [];
+            for (const key in this.form.errors) {
+                this.form.errors[key] = [];
+            }
         },
 
         async submitForm () {
@@ -106,9 +107,13 @@ export default {
                 this.$router.push('/');
             } catch (error) {
                 console.log(error);
+
                 if (typeof error.response !== 'undefined') {
                     if (error.response.status === 422) {
-                        Object.assign(this.form.errors, error.response.data.errors);
+                        Object.assign(
+                            this.form.errors,
+                            error.response.data.errors
+                        );
                     }
                 }
             } finally {

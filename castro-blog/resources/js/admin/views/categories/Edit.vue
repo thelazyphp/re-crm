@@ -90,7 +90,7 @@ export default {
                 },
                 errors: {
                     name: [],
-                    published: false
+                    published: []
                 }
             }
         }

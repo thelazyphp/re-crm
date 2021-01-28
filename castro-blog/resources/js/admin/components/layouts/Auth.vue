@@ -31,12 +31,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-    .bg-login-image {
-        background-image: url('/castro-blog/cover.jpg') !important;
-        background-size: cover !important;
-        background-repeat: no-repeat !important;
-        background-position: center center !important;
-    }
-</style>

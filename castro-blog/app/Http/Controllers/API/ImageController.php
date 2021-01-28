@@ -15,7 +15,7 @@ class ImageController extends Controller
     {
         $this->middleware('auth:sanctum')->except(
             'index',
-            'show',
+            'show'
         );
     }
 
@@ -27,7 +27,7 @@ class ImageController extends Controller
     public function index()
     {
         return ImageResource::collection(
-            Image::paginate()
+            Image::all()
         );
     }
 
