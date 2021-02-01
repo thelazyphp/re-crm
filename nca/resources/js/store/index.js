@@ -11,7 +11,7 @@ export default new Vuex.Store({
 
     state: {
         user: null,
-        isAuth: JSON.parse(localStorage.getItem('isAuth'))
+        isAuth: JSON.parse(localStorage.getItem('isAuth')) || false
     },
 
     mutations: {
