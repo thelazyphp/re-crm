@@ -5,7 +5,7 @@ namespace App\Fields;
 class Checkbox extends Field
 {
     /**
-     * {@inheritDoc}
+     * @var string
      */
-    public static $component = 'x-checkbox-field';
+    public $component = 'v-checkbox-field';
 }

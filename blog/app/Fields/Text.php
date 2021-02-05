@@ -5,7 +5,7 @@ namespace App\Fields;
 class Text extends Field
 {
     /**
-     * {@inheritDoc}
+     * @var string
      */
-    public static $component = 'x-text-field';
+    public $component = 'v-text-field';
 }

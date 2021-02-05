@@ -5,7 +5,7 @@ namespace App\Fields;
 class Textarea extends Field
 {
     /**
-     * {@inheritDoc}
+     * @var string
      */
-    public static $component = 'x-textarea-field';
+    public $component = 'v-textarea-field';
 }

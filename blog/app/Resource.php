@@ -2,7 +2,6 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 abstract class Resource
@@ -18,47 +17,21 @@ abstract class Resource
     public static $label = '';
 
     /**
-     * @var string
+     * @var bool
      */
-    public static $pluralLabel = '';
-
-    /**
-     * @var \Illuminate\Database\Eloquent\Model
-     */
-    protected $resource;
-
-    /**
-     * @return static
-     */
-    public static function make()
-    {
-        return new static(
-            new static::$model
-        );
-    }
+    public static $displayInNavigation = true;
 
     /**
      * @return string
      */
-    public static function key()
+    public static function uriKey()
     {
-        return Str::kebab(
-            Str::plural(
-                class_basename(static::$model)
+        return Str::plural(
+            Str::kebab(
+                class_basename(
+                    get_called_class()
+                )
             )
         );
     }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Model  $resource
-     */
-    public function __construct(Model $resource)
-    {
-        $this->resource = $resource;
-    }
-
-    /**
-     * @return array
-     */
-    abstract public function fields(): array;
 }

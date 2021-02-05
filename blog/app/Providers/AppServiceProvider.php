@@ -2,9 +2,6 @@
 
 namespace App\Providers;
 
-use App\Admin;
-use App\Admin\Comment;
-use App\Admin\Post;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,11 +13,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        Admin::resources([
-            Post::class,
-            Comment::class,
-        ]);
-
         //
     }
 

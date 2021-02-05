@@ -21,17 +21,8 @@ class Post extends Model
         'published',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'published' => 'boolean',
-    ];
-
-    public function comments()
+    public function category()
     {
-        return $this->hasMany(Comment::class);
+        return $this->belongsTo(Category::class);
     }
 }

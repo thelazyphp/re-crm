@@ -2,7 +2,7 @@
 
 namespace App;
 
-class Admin
+abstract class Admin
 {
     /**
      * @var array
