@@ -7,5 +7,5 @@ class Text extends Field
     /**
      * @var string
      */
-    public $component = 'v-text-field';
+    public $component = 'text-field';
 }

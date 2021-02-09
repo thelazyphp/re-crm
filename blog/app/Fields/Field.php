@@ -9,12 +9,12 @@ abstract class Field
     /**
      * @var string
      */
-    protected $label;
+    public $label;
 
     /**
      * @var string
      */
-    protected $attribute;
+    public $attribute;
 
     /**
      * @param  string  $label

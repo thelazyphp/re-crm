@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 abstract class Resource
@@ -34,4 +35,10 @@ abstract class Resource
             )
         );
     }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    abstract public function fields(Request $request): array;
 }

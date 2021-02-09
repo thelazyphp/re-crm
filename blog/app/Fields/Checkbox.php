@@ -7,5 +7,5 @@ class Checkbox extends Field
     /**
      * @var string
      */
-    public $component = 'v-checkbox-field';
+    public $component = 'checkbox-field';
 }

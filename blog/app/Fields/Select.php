@@ -7,5 +7,5 @@ class Select extends Field
     /**
      * @var string
      */
-    public $component = 'v-select-field';
+    public $component = 'select-field';
 }
