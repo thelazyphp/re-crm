@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\API\ResourceController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/{resource}', [ResourceController::class, 'index']);
-Route::post('/{resource}', [ResourceController::class, 'store']);
-Route::get('/{resource}/{resourceId}', [ResourceController::class, 'show']);
-Route::put('/{resource}/{resourceId}', [ResourceController::class, 'update']);
-Route::delete('/{resource}/{resourceId}', [ResourceController::class, 'delete']);
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
