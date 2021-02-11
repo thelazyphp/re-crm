@@ -9,7 +9,7 @@ class Textarea extends Field
     /**
      * @var string
      */
-    public static $component = 'v-textarea-field';
+    public $component = 'textarea-field';
 
     /**
      * @var int
@@ -30,10 +30,11 @@ class Textarea extends Field
     /**
      * {@inheritDoc}
      */
-    public function serializeToArray(Request $request)
+    public function serializeToJSON(Request $request)
     {
         return array_merge(
-            parent::serializeToArray($request), [
+            parent::serializeToJSON($request), [
+                'component' => $this->component,
                 'rows' => $this->rows,
             ]
         );

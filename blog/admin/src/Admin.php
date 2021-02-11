@@ -55,6 +55,14 @@ abstract class Admin
     }
 
     /**
+     * @return string
+     */
+    public static function fallbackLocale()
+    {
+        return config('admin.fallback_locale');
+    }
+
+    /**
      * @param  string  $uriKey
      * @return string|null
      */

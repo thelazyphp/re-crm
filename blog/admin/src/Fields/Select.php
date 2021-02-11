@@ -9,7 +9,7 @@ class Select extends Field
     /**
      * @var string
      */
-    public static $component = 'v-select-field';
+    public $component = 'select-field';
 
     /**
      * @var array|callable
@@ -30,10 +30,11 @@ class Select extends Field
     /**
      * {@inheritDoc}
      */
-    public function serializeToArray(Request $request)
+    public function serializeToJSON(Request $request)
     {
         return array_merge(
-            parent::serializeToArray($request), [
+            parent::serializeToJSON($request), [
+                'component' => $this->component,
                 'options' => $this->getOptions($request),
             ]
         );

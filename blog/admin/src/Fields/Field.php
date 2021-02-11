@@ -2,17 +2,12 @@
 
 namespace Admin\Fields;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 abstract class Field
 {
-    /**
-     * @var string
-     */
-    public static $component;
-
     /**
      * @var string
      */
@@ -24,34 +19,9 @@ abstract class Field
     public $attribute;
 
     /**
-     * @var array|string|callable
+     * @var string
      */
-    public $rules = [];
-
-    /**
-     * @var array|string|callable
-     */
-    public $createRules = [];
-
-    /**
-     * @var array|string|callable
-     */
-    public $updateRules = [];
-
-    /**
-     * @var callable
-     */
-    protected $fillCallback;
-
-    /**
-     * @var callable
-     */
-    protected $resolveCallback;
-
-    /**
-     * @var callable
-     */
-    protected $displayCallback;
+    public $helpText;
 
     /**
      * @var string
@@ -59,135 +29,85 @@ abstract class Field
     public $placeholder;
 
     /**
-     * @var string
+     * @var array|string|callable
      */
-    public $help;
+    protected $rules = [
+        //
+    ];
 
     /**
-     * @var bool|callable
+     * @var array|string|callable
      */
-    public $required = false;
+    protected $createRules = [
+        //
+    ];
 
     /**
-     * @var bool|callable
+     * @var array|string|callable
      */
-    public $readonly = false;
+    protected $updateRules = [
+        //
+    ];
 
     /**
-     * @var array
+     * @var callable
      */
-    public $meta = [];
-
-    /**
-     * @var mixed
-     */
-    public $default;
-
-    /**
-     * @var bool
-     */
-    public $showOnIndex = true;
-
-    /**
-     * @var bool
-     */
-    public $showOnDetail = true;
-
-    /**
-     * @var bool
-     */
-    public $showOnCreate = true;
-
-    /**
-     * @var bool
-     */
-    public $showOnUpdate = true;
+    protected $resolveCallback;
 
     /**
      * @param  string  $label
      * @param  string|null  $attribute
+     * @param  callable|null  $resolveCallback
      * @return static
      */
-    public static function make($label, $attribute = null)
-    {
+    public static function make(
+        $label,
+        $attribute = null,
+        ?callable $resolveCallback = null
+    ) {
         return new static(
             $label,
-            $attribute
+            $attribute,
+            $resolveCallback
         );
     }
 
     /**
      * @param  string  $label
-     * @param  string| null  $attribute
+     * @param  string|null  $attribute
+     * @param  callable|null  $resolveCallback
      */
-    public function __construct($label, $attribute = null)
-    {
+    public function __construct(
+        $label,
+        $attribute = null,
+        ?callable $resolveCallback = null
+    ) {
+        $this->resolveCallback = $resolveCallback;
         $this->label = $label;
         $this->attribute = $attribute ?? Str::snake($label);
     }
 
     /**
-     * @param  array|string|callable  $callback
-     * @return $this
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
      */
-    public function rules($rules)
+    public function serializeToJSON(Request $request)
     {
-        $this->rules = $rules;
-
-        return $this;
+        return [
+            'label' => $this->label,
+            'attribute' => $this->attribute,
+            'helpText' => $this->helpText,
+            'placeholder' => $this->placeholder,
+        ];
     }
 
     /**
-     * @param  array|string|callable  $callback
+     * @param  string  $text
      * @return $this
      */
-    public function createRules($rules)
+    public function helpText($text)
     {
-        $this->createRules = $rules;
-
-        return $this;
-    }
-
-    /**
-     * @param  array|string|callable  $callback
-     * @return $this
-     */
-    public function updateRules($rules)
-    {
-        $this->updateRules = $rules;
-
-        return $this;
-    }
-
-    /**
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function fillUsing(callable $callback)
-    {
-        $this->fillCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function resolveUsing(callable $callback)
-    {
-        $this->resolveCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function displayUsing(callable $callback)
-    {
-        $this->displayCallback = $callback;
+        $this->helpText = $text;
 
         return $this;
     }
@@ -204,354 +124,35 @@ abstract class Field
     }
 
     /**
-     * @param  string  $help
+     * @param  array|string|callable  $rules
      * @return $this
      */
-    public function help($help)
+    public function rules($rules)
     {
-        $this->help = $help;
+        $this->rules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
 
         return $this;
     }
 
     /**
-     * @param  bool|callable  $callback
+     * @param  array|string|callable  $rules
      * @return $this
      */
-    public function required($callback = true)
+    public function createRules($rules)
     {
-        $this->required = $callback;
+        $this->createRules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
 
         return $this;
     }
 
     /**
-     * @param  bool|callable  $callback
+     * @param  array|string|callable  $rules
      * @return $this
      */
-    public function readonly($callback = true)
+    public function updateRules($rules)
     {
-        $this->readonly = $callback;
+        $this->updateRules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
 
         return $this;
-    }
-
-    /**
-     * @param  array  $meta
-     * @return $this
-     */
-    public function meta(array $meta)
-    {
-        $this->meta = $meta;
-
-        return $this;
-    }
-
-    /**
-     * @param  array  $default
-     * @return $this
-     */
-    public function default($default)
-    {
-        $this->default = $default;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function showOnIndex($callback = true)
-    {
-        $this->showOnIndex = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function showOnDetail($callback = true)
-    {
-        $this->showOnDetail = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function showOnCreate($callback = true)
-    {
-        $this->showOnCreate = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function showOnUpdate($callback = true)
-    {
-        $this->showOnUpdate = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function onlyOnIndex()
-    {
-        $this->showOnIndex  = true;
-        $this->showOnDetail = false;
-        $this->showOnCreate = false;
-        $this->showOnUpdate = false;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function onlyOnDetail()
-    {
-        $this->showOnIndex  = false;
-        $this->showOnDetail = true;
-        $this->showOnCreate = false;
-        $this->showOnUpdate = false;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function onlyOnCreate()
-    {
-        $this->showOnIndex  = false;
-        $this->showOnDetail = false;
-        $this->showOnCreate = true;
-        $this->showOnUpdate = false;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function onlyOnUpdate()
-    {
-        $this->showOnIndex  = false;
-        $this->showOnDetail = false;
-        $this->showOnCreate = false;
-        $this->showOnUpdate = true;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function hideFromIndex($callback = true)
-    {
-        $this->showOnIndex = is_callable($callback) ? function () use ($callback) {
-            return ! call_user_func_array(
-                $callback, func_get_args()
-            );
-        } : ! $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function hideFromDetail($callback = true)
-    {
-        $this->showOnDetail = is_callable($callback) ? function () use ($callback) {
-            return ! call_user_func_array(
-                $callback, func_get_args()
-            );
-        } : ! $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function hideFromCreate($callback = true)
-    {
-        $this->showOnCreate = is_callable($callback) ? function () use ($callback) {
-            return ! call_user_func_array(
-                $callback, func_get_args()
-            );
-        } : ! $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  bool|callable  $callback
-     * @return $this
-     */
-    public function hideFromUpdate($callback = true)
-    {
-        $this->showOnUpdate = is_callable($callback) ? function () use ($callback) {
-            return ! call_user_func_array(
-                $callback, func_get_args()
-            );
-        } : ! $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function fill(
-        Request $request,
-        Model $model,
-        $attribute,
-        $value
-    ) {
-        if (is_callable($this->fillCallback)) {
-            call_user_func(
-                $this->fillCallback, $request, $model, $attribute, $value
-            );
-        } else {
-            $model->{$attribute} = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function serializeToArray(Request $request)
-    {
-        return [
-            'component' => static::$component,
-            'label' => $this->label,
-            'attribute' => $this->attribute,
-            'placeholder' => $this->placeholder ?: $this->label,
-            'help' => $this->help,
-            'required' => $this->isRequired($request),
-            'readonly' => $this->isReadonly($request),
-            'meta' => $this->meta,
-            'default' => $this->default,
-            'showOnIndex' => $this->isShowOnIndex($request),
-            'showOnDetail' => $this->isShowOnDetail($request),
-            'showOnCreate' => $this->isShowOnCreate($request),
-            'showOnUpdate' => $this->isShowOnUpdate($request),
-        ];
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isRequired(Request $request)
-    {
-        return is_callable($this->required) ? call_user_func($this->required, $request) : $this->required;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isReadonly(Request $request)
-    {
-        return is_callable($this->readonly) ? call_user_func($this->readonly, $request) : $this->readonly;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isShowOnIndex(Request $request)
-    {
-        return is_callable($this->showOnIndex) ? call_user_func($this->showOnIndex, $request) : $this->showOnIndex;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isShowOnDetail(Request $request)
-    {
-        return is_callable($this->showOnDetail) ? call_user_func($this->showOnDetail, $request) : $this->showOnDetail;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isShowOnCreate(Request $request)
-    {
-        return is_callable($this->showOnCreate) ? call_user_func($this->showOnCreate, $request) : $this->showOnCreate;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isShowOnUpdate(Request $request)
-    {
-        return is_callable($this->showOnUpdate) ? call_user_func($this->showOnUpdate, $request) : $this->showOnUpdate;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function getRules(Request $request)
-    {
-        return [
-            $this->attribute
-                => is_callable($this->rules) ? call_user_func($this->rules, $request) : $this->rules
-        ];
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function getCreateRules(Request $request)
-    {
-        return array_merge_recursive(
-            $this->getRules($request), [
-                $this->attribute
-                    => is_callable($this->createRules) ? call_user_func($this->createRules, $request) : $this->createRules
-            ]
-        );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function getUpdateRules(Request $request)
-    {
-        return array_merge_recursive(
-            $this->getRules($request), [
-                $this->attribute
-                    => is_callable($this->updateRules) ? call_user_func($this->updateRules, $request) : $this->updateRules
-            ]
-        );
     }
 }

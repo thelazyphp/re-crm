@@ -9,7 +9,7 @@ class Checkbox extends Field
     /**
      * @var string
      */
-    public static $component = 'v-checkbox-field';
+    public $component = 'checkbox-field';
 
     /**
      * @var bool
@@ -24,10 +24,11 @@ class Checkbox extends Field
     /**
      * {@inheritDoc}
      */
-    public function serializeToArray(Request $request)
+    public function serializeToJSON(Request $request)
     {
         return array_merge(
-            parent::serializeToArray($request), [
+            parent::serializeToJSON($request), [
+                'component' => $this->component,
                 'trueValue' => $this->trueValue,
                 'falseValue' => $this->falseValue,
             ]
