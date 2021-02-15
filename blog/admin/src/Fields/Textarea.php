@@ -2,8 +2,6 @@
 
 namespace Admin\Fields;
 
-use Illuminate\Http\Request;
-
 class Textarea extends Field
 {
     /**
@@ -30,10 +28,10 @@ class Textarea extends Field
     /**
      * {@inheritDoc}
      */
-    public function serializeToJSON(Request $request)
+    public function jsonSerialize()
     {
         return array_merge(
-            parent::serializeToJSON($request), [
+            parent::jsonSerialize(), [
                 'rows' => $this->rows,
             ]
         );

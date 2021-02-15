@@ -2,6 +2,8 @@
 
 namespace Admin\Fields;
 
+use Closure;
+
 class ID extends Field
 {
     /**
@@ -15,7 +17,7 @@ class ID extends Field
     public static function make(
         $label = 'ID',
         $attribute = 'id',
-        ?callable $resolveCallback = null
+        ?Closure $resolveCallback = null
     ) {
         return new static(
             $label,
@@ -30,7 +32,7 @@ class ID extends Field
     public function __construct(
         $label = 'ID',
         $attribute = 'id',
-        ?callable $resolveCallback = null
+        ?Closure $resolveCallback = null
     ) {
         parent::__construct(
             $label,
@@ -42,7 +44,7 @@ class ID extends Field
     /**
      * @return $this
      */
-    public function asBigInt()
+    public function asString()
     {
         $this->resolveCallback = function ($id) {
             return (string) $id;

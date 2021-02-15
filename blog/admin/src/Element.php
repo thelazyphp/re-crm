@@ -12,11 +12,6 @@ class Element
     public $component;
 
     /**
-     * @var array
-     */
-    public $meta = [];
-
-    /**
      * @var \Closure|bool
      */
     protected $showOnIndex = true;
@@ -38,65 +33,52 @@ class Element
 
     /**
      * @param  string|null  $component
-     * @param  array  $meta
      */
-    public function __construct($component = null, array $meta = [])
+    public function __construct($component = null)
     {
         $this->component = $component;
-        $this->meta = $meta;
     }
 
     /**
-     * @param  array  $meta
+     * @param  \Closure|bool  $showOnIndex
      * @return $this
      */
-    public function meta(array $meta)
+    public function showOnIndex($showOnIndex = true)
     {
-        $this->meta = $meta;
+        $this->showOnIndex = $showOnIndex;
 
         return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $showOnDetail
      * @return $this
      */
-    public function showOnIndex($callback = true)
+    public function showOnDetail($showOnDetail = true)
     {
-        $this->showOnIndex = $callback;
+        $this->showOnDetail = $showOnDetail;
 
         return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $showOnCreate
      * @return $this
      */
-    public function showOnDetail($callback = true)
+    public function showOnCreate($showOnCreate = true)
     {
-        $this->showOnDetail = $callback;
+        $this->showOnCreate = $showOnCreate;
 
         return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $showOnUpdate
      * @return $this
      */
-    public function showOnCreate($callback = true)
+    public function showOnUpdate($showOnUpdate = true)
     {
-        $this->showOnCreate = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|bool  $callback
-     * @return $this
-     */
-    public function showOnUpdate($callback = true)
-    {
-        $this->showOnUpdate = $callback;
+        $this->showOnUpdate = $showOnUpdate;
 
         return $this;
     }
@@ -146,55 +128,63 @@ class Element
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $hideFromIndex
      * @return $this
      */
-    public function hideFromIndex($callback = true)
+    public function hideFromIndex($hideFromIndex = true)
     {
-        $this->showOnIndex = is_callable($callback) ? function () use ($callback) {
+        $this->showOnIndex = is_callable($hideFromIndex) ? function () use ($hideFromIndex) {
             return ! call_user_func_array(
-                $callback, func_get_args()
+                $hideFromIndex, func_get_args()
             );
-        } : ! $callback;
+        } : ! $hideFromIndex;
+
+        return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $hideFromDetail
      * @return $this
      */
-    public function hideFromDetail($callback = true)
+    public function hideFromDetail($hideFromDetail = true)
     {
-        $this->showOnDetail = is_callable($callback) ? function () use ($callback) {
+        $this->showOnDetail = is_callable($hideFromDetail) ? function () use ($hideFromDetail) {
             return ! call_user_func_array(
-                $callback, func_get_args()
+                $hideFromDetail, func_get_args()
             );
-        } : ! $callback;
+        } : ! $hideFromDetail;
+
+        return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $hideFromCreate
      * @return $this
      */
-    public function hideFromCreate($callback = true)
+    public function hideFromCreate($hideFromCreate = true)
     {
-        $this->showOnCreate = is_callable($callback) ? function () use ($callback) {
+        $this->showOnCreate = is_callable($hideFromCreate) ? function () use ($hideFromCreate) {
             return ! call_user_func_array(
-                $callback, func_get_args()
+                $hideFromCreate, func_get_args()
             );
-        } : ! $callback;
+        } : ! $hideFromCreate;
+
+        return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $hideFromUpdate
      * @return $this
      */
-    public function hideFromUpdate($callback = true)
+    public function hideFromUpdate($hideFromUpdate = true)
     {
-        $this->showOnUpdate = is_callable($callback) ? function () use ($callback) {
+        $this->showOnUpdate = is_callable($hideFromUpdate) ? function () use ($hideFromUpdate) {
             return ! call_user_func_array(
-                $callback, func_get_args()
+                $hideFromUpdate, func_get_args()
             );
-        } : ! $callback;
+        } : ! $hideFromUpdate;
+
+        return $this;
     }
 
     /**

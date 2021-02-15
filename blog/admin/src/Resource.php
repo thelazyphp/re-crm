@@ -3,16 +3,23 @@
 namespace Admin;
 
 use Admin\Fields\Field;
+use Admin\Fields\ID;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use JsonSerializable;
 
-abstract class Resource
+abstract class Resource implements JsonSerializable
 {
     /**
      * @var string
      */
     public static $model;
+
+    /**
+     * @var string
+     */
+    public static $title = 'id';
 
     /**
      * @var bool
@@ -27,7 +34,7 @@ abstract class Resource
     /**
      * @return string
      */
-    public static function uriKey()
+    public static function name()
     {
         return Str::plural(
             Str::kebab(
@@ -77,14 +84,14 @@ abstract class Resource
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * {@inheritDoc}
      */
-    public function serializeToJSON(Request $request)
+    public function jsonSerialize()
     {
         return [
+            'title' => static::$title,
             'displayInNavigation' => static::$displayInNavigation,
-            'uriKey' => static::uriKey(),
+            'name' => static::name(),
             'label' => static::label(),
             'pluralLabel' => static::pluralLabel(),
         ];
@@ -118,34 +125,9 @@ abstract class Resource
      * @param  \Illuminate\Http\Request  $request
      * @return \Admin\Fields\Field[]
      */
-    public function fieldsForCreate(Request $request)
+    public function fieldsForForms(Request $request)
     {
         return [];
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Admin\Fields\Field[]
-     */
-    public function fieldsForUpdate(Request $request)
-    {
-        return [];
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function model(): Model
-    {
-        return $this->resource;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function modelKey()
-    {
-        return $this->model()->getKey();
     }
 
     /**
@@ -180,10 +162,12 @@ abstract class Resource
      */
     public function createFields(Request $request)
     {
-        $fieldsForCreate = $this->fieldsForCreate($request);
+        $fieldsForForms = $this->fieldsForForms($request);
 
-        return collect(empty($fieldsForCreate) ? $this->fields($request) : $fieldsForCreate)->filter(function ($field) use ($request) {
-            return $field instanceof Field && $field->isShowOnCreate($request);
+        return collect(empty($fieldsForForms) ? $this->fields($request) : $fieldsForForms)->filter(function ($field) use ($request) {
+            return $field instanceof Field &&
+                ! $field instanceof ID &&
+                $field->isShowOnCreate($request);
         });
     }
 
@@ -193,10 +177,12 @@ abstract class Resource
      */
     public function updateFields(Request $request)
     {
-        $fieldsForUpdate = $this->fieldsForUpdate($request);
+        $fieldsForForms = $this->fieldsForForms($request);
 
-        return collect(empty($fieldsForUpdate) ? $this->fields($request) : $fieldsForUpdate)->filter(function ($field) use ($request) {
-            return $field instanceof Field && $field->isShowOnUpdate($request);
+        return collect(empty($fieldsForForms) ? $this->fields($request) : $fieldsForForms)->filter(function ($field) use ($request) {
+            return $field instanceof Field &&
+                ! $field instanceof ID &&
+                $field->isShowOnUpdate($request);
         });
     }
 }

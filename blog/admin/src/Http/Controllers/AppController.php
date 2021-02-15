@@ -15,7 +15,7 @@ class AppController extends Controller
     public function __invoke(Request $request)
     {
         return view('admin::app', [
-            'initialState' => Admin::serializeToJSON($request),
+            'config' => Admin::toJSON(),
         ]);
     }
 }

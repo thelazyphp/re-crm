@@ -23,7 +23,7 @@
         </style>
 
         <script>
-            window.__INITIAL_STATE__ = @json($initialState);
+            window.config = @json($config);
         </script>
     </head>
     <body>

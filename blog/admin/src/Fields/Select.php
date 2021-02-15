@@ -14,7 +14,7 @@ class Select extends Field
     /**
      * @var \Closure|array
      */
-    public $options = [];
+    protected $options = [];
 
     /**
      * @param  \Closure|array  $options
@@ -30,11 +30,11 @@ class Select extends Field
     /**
      * {@inheritDoc}
      */
-    public function serializeToJSON(Request $request)
+    public function jsonSerialize()
     {
         return array_merge(
-            parent::serializeToJSON($request), [
-                'options' => $this->getOptions($request),
+            parent::jsonSerialize(), [
+                'options' => $this->getOptions(request()),
             ]
         );
     }

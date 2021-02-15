@@ -32,12 +32,6 @@ class AdminServiceProvider extends ServiceProvider
             ]);
         }
 
-        Admin::resources(
-            config(
-                'admin.resources', []
-            )
-        );
-
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 

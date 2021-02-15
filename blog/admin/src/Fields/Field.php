@@ -4,12 +4,19 @@ namespace Admin\Fields;
 
 use Admin\Element;
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use JsonSerializable;
 
-abstract class Field extends Element
+abstract class Field extends Element implements JsonSerializable
 {
+    /**
+     * @var mixed
+     */
+    public $value;
+
     /**
      * @var string
      */
@@ -23,22 +30,32 @@ abstract class Field extends Element
     /**
      * @var string
      */
-    public $placeholder;
+    public $help;
 
     /**
      * @var string
      */
-    public $helpText;
+    public $placeholder;
 
     /**
      * @var \Closure|mixed
      */
-    protected $default;
+    protected $default = false;
 
     /**
      * @var \Closure|bool
      */
-    protected $required;
+    protected $nullable = false;
+
+    /**
+     * @var \Closure|bool
+     */
+    protected $required = false;
+
+    /**
+     * @var \Closure|bool
+     */
+    protected $readonly = false;
 
     /**
      * @var \Closure
@@ -73,13 +90,13 @@ abstract class Field extends Element
     /**
      * @param  string  $label
      * @param  string|null  $attribute
-     * @param  callable|null  $resolveCallback
+     * @param  \Closure|null  $resolveCallback
      * @return static
      */
     public static function make(
         $label,
         $attribute = null,
-        ?callable $resolveCallback = null
+        ?Closure $resolveCallback = null
     ) {
         return new static(
             $label,
@@ -91,12 +108,12 @@ abstract class Field extends Element
     /**
      * @param  string  $label
      * @param  string|null  $attribute
-     * @param  callable|null  $resolveCallback
+     * @param  \Closure|null  $resolveCallback
      */
     public function __construct(
         $label,
         $attribute = null,
-        ?callable $resolveCallback = null
+        ?Closure $resolveCallback = null
     ) {
         $this->resolveCallback = $resolveCallback;
         $this->label = $label;
@@ -105,20 +122,52 @@ abstract class Field extends Element
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
      */
-    public function serializeToJSON(Request $request)
+    public function fill(Request $request, Model $model)
+    {
+        if (is_callable($this->fillCallback)) {
+            call_user_func(
+                $this->fillCallback, $request, $model, $this->attribute
+            );
+        } else {
+            $model->{$this->attribute} = $request->input(
+                $this->attribute, $this->getDefault($request)
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function jsonSerialize()
     {
         return [
             'component' => $this->component,
-            'meta' => $this->meta,
+            'value' => $this->value,
             'label' => $this->label,
             'attribute' => $this->attribute,
+            'help' => $this->help,
             'placeholder' => $this->placeholder,
-            'helpText' => $this->helpText,
-            'default' => $this->getDefault($request),
-            'required' => $this->isRequired($request),
+            'default' => $this->getDefault(request()),
+            'nullable' => $this->isNullable(request()),
+            'required' => $this->isRequired(request()),
+            'readonly' => $this->isReadonly(request()),
         ];
+    }
+
+    /**
+     * @param  string  $help
+     * @return $this
+     */
+    public function help($help)
+    {
+        $this->help = $help;
+
+        return $this;
     }
 
     /**
@@ -133,34 +182,45 @@ abstract class Field extends Element
     }
 
     /**
-     * @param  string  $text
+     * @param  \Closure|mixed  $default
      * @return $this
      */
-    public function helpText($text)
+    public function default($default)
     {
-        $this->helpText = $text;
+        $this->default = $default;
 
         return $this;
     }
 
     /**
-     * @param  \Closure|mixed  $callback
+     * @param  \Closure|bool  $nullable
      * @return $this
      */
-    public function default($callback = true)
+    public function nullable($nullable = true)
     {
-        $this->default = $callback;
+        $this->nullable = $nullable;
 
         return $this;
     }
 
     /**
-     * @param  \Closure|bool  $callback
+     * @param  \Closure|bool  $required
      * @return $this
      */
-    public function required($callback = true)
+    public function required($required = true)
     {
-        $this->required = $callback;
+        $this->required = $required;
+
+        return $this;
+    }
+
+    /**
+     * @param  \Closure|bool  $readonly
+     * @return $this
+     */
+    public function readonly($readonly = true)
+    {
+        $this->readonly = $readonly;
 
         return $this;
     }
@@ -233,6 +293,24 @@ abstract class Field extends Element
 
     /**
      * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function getDefault(Request $request)
+    {
+        return is_callable($this->default) ? call_user_func($this->default, $request) : $this->default;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function isNullable(Request $request)
+    {
+        return is_callable($this->nullable) ? call_user_func($this->nullable, $request) : $this->nullable;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function isRequired(Request $request)
@@ -242,11 +320,11 @@ abstract class Field extends Element
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return bool
      */
-    public function getDefault(Request $request)
+    public function isReadonly(Request $request)
     {
-        return is_callable($this->default) ? call_user_func($this->default, $request) : $this->default;
+        return is_callable($this->readonly) ? call_user_func($this->readonly, $request) : $this->readonly;
     }
 
     /**
@@ -258,7 +336,9 @@ abstract class Field extends Element
         $rules = is_callable($this->rules) ? call_user_func($this->rules, $request) : $this->rules;
 
         if (is_string($rules)) {
-            $rules = explode('|', $rules);
+            $rules = explode(
+                '|', $rules
+            );
         }
 
         return [$this->attribute => $rules];
@@ -273,7 +353,9 @@ abstract class Field extends Element
         $rules = is_callable($this->createRules) ? call_user_func($this->createRules, $request) : $this->createRules;
 
         if (is_string($rules)) {
-            $rules = explode('|', $rules);
+            $rules = explode(
+                '|', $rules
+            );
         }
 
         return array_merge_recursive(
@@ -292,7 +374,9 @@ abstract class Field extends Element
         $rules = is_callable($this->updateRules) ? call_user_func($this->updateRules, $request) : $this->updateRules;
 
         if (is_string($rules)) {
-            $rules = explode('|', $rules);
+            $rules = explode(
+                '|', $rules
+            );
         }
 
         return array_merge_recursive(

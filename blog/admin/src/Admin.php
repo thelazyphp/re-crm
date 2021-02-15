@@ -3,7 +3,6 @@
 namespace Admin;
 
 use GuzzleHttp\Psr7\Uri;
-use Illuminate\Http\Request;
 
 abstract class Admin
 {
@@ -63,32 +62,23 @@ abstract class Admin
     }
 
     /**
-     * @return string
-     */
-    public static function fallbackLocale()
-    {
-        return config('admin.fallback_locale');
-    }
-
-    /**
-     * @param  string  $uriKey
+     * @param  string  $name
      * @return string|null
      */
-    public static function resourceByUriKey($uriKey)
+    public static function resourceByName($name)
     {
-        return collect(static::$resources)->first(function ($resource) use ($uriKey) {
-            return $uriKey == $resource::uriKey();
+        return collect(static::$resources)->first(function ($resource) use ($name) {
+            return $name == $resource::name();
         });
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public static function serializeToJSON(Request $request)
+    public static function toJSON()
     {
-        $resources = collect(static::$resources)->map(function ($resource) use ($request) {
-            return (new $resource($resource::newModel()))->serializeToJSON($request);
+        $resources = collect(static::$resources)->map(function ($resource) {
+            return new $resource($resource::newModel());
         });
 
         return [
@@ -98,10 +88,10 @@ abstract class Admin
             'name' => static::name(),
             'path' => static::path(),
             'locale' => static::locale(),
-            'fallbackLocale' => static::fallbackLocale(),
             'assetUrl' => asset('vendor/admin'),
-            'apiBaseUrl' => rtrim(config('app.url'), '/').'/'.trim(static::path(), '/').'/api',
-            'routerBaseUrl' => '/'.trim((new Uri(config('app.url')))->getPath(), '/').'/'.trim(static::path(), '/').'/',
+            'baseUrl' => config('app.url').static::path(),
+            'apiBaseUrl' => config('app.url').static::path().'/api',
+            'routerBaseUrl' => '/'.trim((new Uri(config('app.url').static::path()))->getPath(), '/').'/',
         ];
     }
 }
