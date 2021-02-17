@@ -23,7 +23,8 @@ abstract class Parser
 
     /**
      * @param  \Psr\Http\Message\UriInterface  $url
+     * @param  \App\HtmlDocument  $html
      * @return array
      */
-    abstract public function rules(UriInterface $url): array;
+    abstract public function rules(UriInterface $url, HtmlDocument $html): array;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Parsers;
 
+use App\HtmlDocument;
 use App\Models\Ad;
 use App\Parser;
 use App\ParserRule;
@@ -22,7 +23,7 @@ class Irr extends Parser
     /**
      * {@inheritDoc}
      */
-    public function rules(UriInterface $url): array
+    public function rules(UriInterface $url, HtmlDocument $html): array
     {
         return [
             'title' => (new ParserRule())->find('.title3')->text()->normalizeSpaces(),
