@@ -40,6 +40,17 @@ class ParserRule
 
     /**
      * @param  mixed  $source
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($source)
+    {
+        return collect(
+            $this->eval($source)
+        );
+    }
+
+    /**
+     * @param  mixed  $source
      * @return bool
      */
     public function empty($source)
@@ -152,7 +163,7 @@ class ParserRule
     public function nextSibling()
     {
         $this->closures[] = function ($result) {
-            if ($result instanceof HtmlElement || $result instanceof HtmlDocument) {
+            if ($result instanceof HtmlElement) {
                 return $result->nextElementSibling();
             }
 
@@ -168,7 +179,7 @@ class ParserRule
     public function previousSibling()
     {
         $this->closures[] = function ($result) {
-            if ($result instanceof HtmlElement || $result instanceof HtmlDocument) {
+            if ($result instanceof HtmlElement) {
                 return $result->previousElementSibling();
             }
 

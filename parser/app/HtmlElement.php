@@ -10,11 +10,29 @@ class HtmlElement extends DOMElement
 {
     /**
      * @param  string  $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return $this->hasAttribute($name);
+    }
+
+    /**
+     * @param  string  $name
      * @return string
      */
     public function __get($name)
     {
         return $this->getAttribute($name);
+    }
+
+    /**
+     * @param  string  $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+        $this->removeAttribute($name);
     }
 
     /**
