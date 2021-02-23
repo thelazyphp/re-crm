@@ -2,15 +2,9 @@
 
 namespace Admin\Fields;
 
-use Admin\Element;
-use Closure;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use JsonSerializable;
 
-abstract class Field extends Element implements JsonSerializable
+abstract class Field
 {
     /**
      * @var mixed
@@ -20,7 +14,7 @@ abstract class Field extends Element implements JsonSerializable
     /**
      * @var string
      */
-    public $label;
+    public $name;
 
     /**
      * @var string
@@ -28,219 +22,54 @@ abstract class Field extends Element implements JsonSerializable
     public $attribute;
 
     /**
-     * @var string
-     */
-    public $help;
-
-    /**
-     * @var string
-     */
-    public $placeholder;
-
-    /**
-     * @var \Closure|mixed
-     */
-    protected $default = false;
-
-    /**
-     * @var \Closure|bool
-     */
-    protected $nullable = false;
-
-    /**
-     * @var \Closure|bool
-     */
-    protected $required = false;
-
-    /**
-     * @var \Closure|bool
-     */
-    protected $readonly = false;
-
-    /**
-     * @var \Closure
-     */
-    protected $fillCallback;
-
-    /**
-     * @var \Closure
+     * @var callable
      */
     protected $resolveCallback;
 
     /**
-     * @var \Closure
+     * @var callable
      */
     protected $displayCallback;
 
     /**
-     * @var \Closure|array|string
+     * @var callable
      */
-    protected $rules = [];
+    protected $attributeCallback;
 
     /**
-     * @var \Closure|array|string
-     */
-    protected $createRules = [];
-
-    /**
-     * @var \Closure|array|string
-     */
-    protected $updateRules = [];
-
-    /**
-     * @param  string  $label
-     * @param  string|null  $attribute
-     * @param  \Closure|null  $resolveCallback
+     * @param  string  $name
+     * @param  callable|string|null  $attribute
      * @return static
      */
-    public static function make(
-        $label,
-        $attribute = null,
-        ?Closure $resolveCallback = null
-    ) {
+    public static function make($name, $attribute = null)
+    {
         return new static(
-            $label,
-            $attribute,
-            $resolveCallback
+            $name,
+            $attribute
         );
     }
 
     /**
-     * @param  string  $label
-     * @param  string|null  $attribute
-     * @param  \Closure|null  $resolveCallback
+     * @param  string  $name
+     * @param  callable|string|null  $attribute
      */
-    public function __construct(
-        $label,
-        $attribute = null,
-        ?Closure $resolveCallback = null
-    ) {
-        $this->resolveCallback = $resolveCallback;
-        $this->label = $label;
-        $this->attribute = $attribute ?? Str::snake($label);
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return $this
-     */
-    public function fill(Request $request, Model $model)
+    public function __construct($name, $attribute = null)
     {
-        if (is_callable($this->fillCallback)) {
-            call_user_func(
-                $this->fillCallback, $request, $model, $this->attribute
-            );
+        $this->name = $name;
+
+        if (is_callable($attribute)) {
+            $this->attribute = '__COMPUTED__';
+            $this->attributeCallback = $attribute;
         } else {
-            $model->{$this->attribute} = $request->input(
-                $this->attribute, $this->getDefault($request)
-            );
+            $this->attribute = $attribute ?? Str::snake($name);
         }
-
-        return $this;
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'component' => $this->component,
-            'value' => $this->value,
-            'label' => $this->label,
-            'attribute' => $this->attribute,
-            'help' => $this->help,
-            'placeholder' => $this->placeholder,
-            'default' => $this->getDefault(request()),
-            'nullable' => $this->isNullable(request()),
-            'required' => $this->isRequired(request()),
-            'readonly' => $this->isReadonly(request()),
-        ];
-    }
-
-    /**
-     * @param  string  $help
+     * @param  callable  $callback
      * @return $this
      */
-    public function help($help)
-    {
-        $this->help = $help;
-
-        return $this;
-    }
-
-    /**
-     * @param  string  $placeholder
-     * @return $this
-     */
-    public function placeholder($placeholder)
-    {
-        $this->placeholder = $placeholder;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|mixed  $default
-     * @return $this
-     */
-    public function default($default)
-    {
-        $this->default = $default;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|bool  $nullable
-     * @return $this
-     */
-    public function nullable($nullable = true)
-    {
-        $this->nullable = $nullable;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|bool  $required
-     * @return $this
-     */
-    public function required($required = true)
-    {
-        $this->required = $required;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|bool  $readonly
-     * @return $this
-     */
-    public function readonly($readonly = true)
-    {
-        $this->readonly = $readonly;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function fillUsing(Closure $callback)
-    {
-        $this->fillCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function resolveUsing(Closure $callback)
+    public function resolveUsing(callable $callback)
     {
         $this->resolveCallback = $callback;
 
@@ -248,10 +77,10 @@ abstract class Field extends Element implements JsonSerializable
     }
 
     /**
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return $this
      */
-    public function displayUsing(Closure $callback)
+    public function displayUsing(callable $callback)
     {
         $this->displayCallback = $callback;
 
@@ -259,130 +88,25 @@ abstract class Field extends Element implements JsonSerializable
     }
 
     /**
-     * @param  \Closure|array|string  $rules
-     * @return $this
+     * @param  mixed  $resource
+     * @return void
      */
-    public function rules($rules)
+    public function resolve($resource)
     {
-        $this->rules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|array|string  $rules
-     * @return $this
-     */
-    public function createRules($rules)
-    {
-        $this->createRules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Closure|array|string  $rules
-     * @return $this
-     */
-    public function updateRules($rules)
-    {
-        $this->updateRules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    public function getDefault(Request $request)
-    {
-        return is_callable($this->default) ? call_user_func($this->default, $request) : $this->default;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isNullable(Request $request)
-    {
-        return is_callable($this->nullable) ? call_user_func($this->nullable, $request) : $this->nullable;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isRequired(Request $request)
-    {
-        return is_callable($this->required) ? call_user_func($this->required, $request) : $this->required;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isReadonly(Request $request)
-    {
-        return is_callable($this->readonly) ? call_user_func($this->readonly, $request) : $this->readonly;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function getRules(Request $request)
-    {
-        $rules = is_callable($this->rules) ? call_user_func($this->rules, $request) : $this->rules;
-
-        if (is_string($rules)) {
-            $rules = explode(
-                '|', $rules
+        if ($this->attribute == '__COMPUTED__') {
+            $this->value = call_user_func(
+                $this->attributeCallback, $resource
             );
-        }
-
-        return [$this->attribute => $rules];
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function getCreateRules(Request $request)
-    {
-        $rules = is_callable($this->createRules) ? call_user_func($this->createRules, $request) : $this->createRules;
-
-        if (is_string($rules)) {
-            $rules = explode(
-                '|', $rules
+        } else {
+            $this->value = data_get(
+                $resource, $this->attribute
             );
+
+            if (is_callable($this->resolveCallback)) {
+                $this->value = call_user_func(
+                    $this->resolveCallback, $this->value
+                );
+            }
         }
-
-        return array_merge_recursive(
-            $this->getRules($request), [
-                $this->attribute => $rules,
-            ]
-        );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function getUpdateRules(Request $request)
-    {
-        $rules = is_callable($this->updateRules) ? call_user_func($this->updateRules, $request) : $this->updateRules;
-
-        if (is_string($rules)) {
-            $rules = explode(
-                '|', $rules
-            );
-        }
-
-        return array_merge_recursive(
-            $this->getRules($request), [
-                $this->attribute => $rules,
-            ]
-        );
     }
 }
