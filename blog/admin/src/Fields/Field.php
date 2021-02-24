@@ -648,7 +648,6 @@ abstract class Field implements JsonSerializable
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $resource
      * @return bool
      */
     public function isShowOnCreate(Request $request)

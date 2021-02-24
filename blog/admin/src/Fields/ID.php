@@ -44,10 +44,6 @@ class ID extends Field
             $this->resolveUsing(function ($value) {
                 return (string) $value;
             });
-
-            $this->displayUsing(function ($value) {
-                return (string) $value;
-            });
         }
 
         return $this;

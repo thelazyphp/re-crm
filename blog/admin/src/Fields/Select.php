@@ -21,13 +21,13 @@ class Select extends Field
     public function options($options)
     {
         if (is_callable($options)) {
-            $options = call_user_func($options);
+            $options = call_user_func($options) ?: [];
         }
 
-        $this->options = collect($options ?: [])->map(function ($key, $value) {
+        $this->options = collect($options)->map(function ($key, $value) {
             return [
-                'label' => $key,
-                'value' => $value,
+                'value' => $key,
+                'label' => $value,
             ];
         })->values()->all();
     }
@@ -40,16 +40,24 @@ class Select extends Field
     {
         if ($displayUsingLabels) {
             $this->displayUsing(function ($value) {
-                $option = collect($this->options)->first(function ($option) use ($value) {
-                    return $option['value'] == $value;
-                });
-
-                return ! $option
-                    ? $value
-                    : $option['label'];
+                return collect($this->options)
+                    ->where('value', $value)
+                    ->first()['label'] ?? $value;
             });
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(
+            parent::jsonSerialize(), [
+                'options' => $this->options,
+            ]
+        );
     }
 }

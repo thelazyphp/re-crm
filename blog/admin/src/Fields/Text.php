@@ -24,4 +24,16 @@ class Text extends Field
 
         return $this;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(
+            parent::jsonSerialize(), [
+                'asHtml' => $this->asHtml,
+            ]
+        );
+    }
 }

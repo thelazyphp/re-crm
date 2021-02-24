@@ -40,4 +40,17 @@ class Checkbox extends Field
 
         return $this;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(
+            parent::jsonSerialize(), [
+                'trueValue' => $this->trueValue,
+                'falseValue' => $this->falseValue,
+            ]
+        );
+    }
 }
