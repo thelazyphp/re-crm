@@ -1,0 +1,19 @@
+{
+    "name": "admin/admin",
+    "description": "",
+    "autoload": {
+        "psr-4": {
+            "Admin\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "Admin": "Admin\\Admin"
+            },
+            "providers": [
+                "Admin\\AdminServiceProvider"
+            ]
+        }
+    }
+}
