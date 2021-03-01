@@ -364,7 +364,7 @@ abstract class Field implements JsonSerializable
     {
         return array_merge_recursive(
             $this->getRules($request), [
-                $this->attribute = ! is_callable($this->createRules)
+                $this->attribute => ! is_callable($this->createRules)
                     ? $this->createRules
                     : call_user_func(
                         $this->createRules, $request
@@ -394,7 +394,7 @@ abstract class Field implements JsonSerializable
     {
         return array_merge_recursive(
             $this->getRules($request), [
-                $this->attribute = ! is_callable($this->updateRules)
+                $this->attribute => ! is_callable($this->updateRules)
                     ? $this->updateRules
                     : call_user_func(
                         $this->updateRules, $request
@@ -718,7 +718,7 @@ abstract class Field implements JsonSerializable
     protected function getRules(Request $request)
     {
         return [
-            $this->attribute = ! is_callable($this->rules)
+            $this->attribute => ! is_callable($this->rules)
                 ? $this->rules
                 : call_user_func(
                     $this->rules, $request

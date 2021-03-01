@@ -6,8 +6,7 @@
         <div class="row">
             <div class="col-lg-4 col-xl-3">
                 <div class="card border-top-0 border-end-0 border-bottom-0 border-start border-4 border-primary shadow-sm mb-4">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-2x fa-home text-primary me-2"></i>
+                    <div class="card-body">
                         <h4 class="card-title mb-0">
                             Welcome!
                         </h4>

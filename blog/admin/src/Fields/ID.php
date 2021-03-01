@@ -28,10 +28,14 @@ class ID extends Field
      */
     public static function forModel(Model $model)
     {
-        return static::make(
+        $field = static::make(
             'ID',
             $model->getKeyName()
         );
+
+        $field->resolve($model, true);
+
+        return $field;
     }
 
     /**

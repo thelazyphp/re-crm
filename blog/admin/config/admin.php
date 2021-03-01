@@ -2,7 +2,7 @@
 
 return [
 
-    'name' => env('APP_NAME', 'Laravel').' - Admin',
+    'name' => env('APP_NAME', 'Laravel').' Admin',
 
     'path' => '/admin',
 

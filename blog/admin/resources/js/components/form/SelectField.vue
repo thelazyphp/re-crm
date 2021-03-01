@@ -1,13 +1,15 @@
 <template>
-    <base-field :field="field">
-        <select :id="fieldId"
+    <base-field :field="field"
+                :errors="errors">
+        <select :id="field.attribute"
                 v-model="value"
                 v-bind="attributes"
-                class="form-control"
-                :aria-describedby="!field.help ? null : `${fieldId}-help`">
-            <option :value="null"
+                class="form-select"
+                :readonly="field.readonly"
+                :aria-describedby="field.help ? `${field.attribute}-help` : null">
+            <option value=""
                     :disabled="!field.nullable">
-                {{ field.meta.placeholder || 'Choose an option...' }}
+                {{ placeholder }}
             </option>
             <option v-for="(option, index) in field.options"
                     :key="index"
@@ -19,39 +21,26 @@
 </template>
 
 <script>
-export default {
-    props: {
-        field: {
-            type: Object,
-            required: true
-        }
-    },
+import BaseField from './BaseField.vue';
+import formField from '../../mixins/formField';
+import formFieldErrors from '../../mixins/formFieldErrors';
 
-    data () {
-        return {
-            value: null
-        }
+export default {
+    mixins: [formField, formFieldErrors],
+
+    components: {
+        BaseField,
     },
 
     computed: {
-        fieldId () {
-            return `${this.field.attribute}-field`;
-        },
-
         attributes () {
             return {
-                disabled: this.field.readonly || false
+                class: this.errorClass
             };
-        }
-    },
+        },
 
-    created () {
-        this.value = this.field.value || this.field.default || null;
-    },
-
-    methods: {
-        fill (data) {
-            data.append(this.field.attribute, this.value);
+        placeholder () {
+            return this.field.meta.placeholder || 'Choose an option...';
         }
     }
 };

@@ -1,49 +1,34 @@
 <template>
-    <base-field :field="field">
-        <textarea :id="fieldId"
+    <base-field :field="field"
+                :errors="errors">
+        <textarea :id="field.attribute"
                   v-model="value"
                   v-bind="attributes"
                   class="form-control"
-                  :aria-describedby="!field.help ? null : `${fieldId}-help`"></textarea>
+                  :readonly="field.readonly"
+                  :aria-describedby="field.help ? `${field.attribute}-help` : null"></textarea>
     </base-field>
 </template>
 
 <script>
-export default {
-    props: {
-        field: {
-            type: Object,
-            required: true
-        }
-    },
+import BaseField from './BaseField.vue';
+import formField from '../../mixins/formField';
+import formFieldErrors from '../../mixins/formFieldErrors';
 
-    data () {
-        return {
-            value: ''
-        }
+export default {
+    mixins: [formField, formFieldErrors],
+
+    components: {
+        BaseField,
     },
 
     computed: {
-        fieldId () {
-            return `${this.field.attribute}-field`;
-        },
-
         attributes () {
             return {
+                class: this.errorClass,
                 rows: this.field.meta.rows || 3,
-                disabled: this.field.readonly || false,
                 placeholder: this.field.meta.placeholder || this.field.name
             };
-        }
-    },
-
-    created () {
-        this.value = this.field.value || this.field.default || '';
-    },
-
-    methods: {
-        fill (data) {
-            data.append(this.field.attribute, this.value);
         }
     }
 };

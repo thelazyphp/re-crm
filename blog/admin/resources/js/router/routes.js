@@ -1,5 +1,6 @@
 import Dashboard from '../views/Dashboard.vue';
 import Index from '../views/Index.vue';
+import Show from '../views/Show.vue';
 import Create from '../views/Create.vue';
 import Update from '../views/Update.vue';
 
@@ -24,6 +25,11 @@ export default [
         path: '/resources/:resourceName/create',
         name: 'create',
         component: Create
+    },
+    {
+        path: '/resources/:resourceName/:resourceId/show',
+        name: 'show',
+        component: Show
     },
     {
         path: '/resources/:resourceName/:resourceId/update',

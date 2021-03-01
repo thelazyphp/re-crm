@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h4 class="mb-4">
-            Update {{ resourceInfo.label }}
+            Edit {{ resourceInfo.label }}
         </h4>
         <template v-if="loading">
             <div class="text-center">
@@ -19,13 +19,19 @@
                       @submit.prevent="handleSubmit">
                     <fieldset :disabled="submitting">
                         <component v-for="(field, index) in fields"
-                                   :is="field.component"
+                                   :is="`form-${field.component}`"
                                    :key="index"
-                                   :field="field"/>
+                                   :field="field"
+                                   :errors="errors"/>
                         <div class="text-end">
                             <button class="btn btn-primary"
+                                    type="button"
+                                    @click="$router.back()">
+                                Back
+                            </button>
+                            <button class="btn btn-primary ms-2"
                                     type="submit">
-                                Update {{ resourceInfo.label }}
+                                Edit {{ resourceInfo.label }}
                             </button>
                         </div>
                     </fieldset>
@@ -37,27 +43,29 @@
 
 <script>
 import axios from 'axios';
+import Errors from '../helpers/Errors';
 
 export default {
     data () {
         return {
             loading: false,
+            submitting: false,
             fields: [],
-            submitting: false
+            errors: new Errors()
         };
     },
 
     computed: {
-        resourceName () {
-            return this.$route.params.resourceName;
-        },
-
         resourceId () {
             return this.$route.params.resourceId;
         },
 
+        resourceName () {
+            return this.$route.params.resourceName;
+        },
+
         resourceInfo () {
-            return window.config.resources.find(item => item.name === this.resourceName);
+            return window.config.resources.find(resource => resource.name === this.resourceName);
         }
     },
 
@@ -78,6 +86,8 @@ export default {
 
                 this.fields = fields;
             } catch (error) {
+                //
+
                 console.log(error);
             } finally {
                 this.loading = false;
@@ -86,11 +96,28 @@ export default {
 
         async handleSubmit() {
             this.submitting = true;
+            this.errors.clear();
 
             try {
-                //
+                const data = {};
+
+                this.fields.forEach(field => {
+                    field.fill(data);
+                });
+
+                await axios.put(`/resources/${this.resourceName}/${this.resourceId}`, data);
+
+                this.$router.push({
+                    name: 'index'
+                });
             } catch (error) {
                 console.log(error);
+
+                if (error.response.status === 422) {
+                    this.errors = new Errors(
+                        error.response.data.errors
+                    );
+                }
             } finally {
                 this.submitting = false;
             }

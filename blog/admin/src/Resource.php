@@ -24,6 +24,11 @@ abstract class Resource implements JsonSerializable
     public static $model;
 
     /**
+     * @var string
+     */
+    public static $title = 'id';
+
+    /**
      * @var bool
      */
     public static $showInNavigation = true;
@@ -97,6 +102,22 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
+     * @return string
+     */
+    public function title()
+    {
+        return $this->model()->{static::$title};
+    }
+
+    /**
+     * @return string|null
+     */
+    public function subtitle()
+    {
+        return null;
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function model()
@@ -112,7 +133,7 @@ abstract class Resource implements JsonSerializable
     {
         return collect($this->getCreateFields($request, false))->mapWithKeys(function (Field $field) use ($request) {
             return $field->getCreateRules($request);
-        })->values()->all();
+        })->all();
     }
 
     /**
@@ -135,7 +156,7 @@ abstract class Resource implements JsonSerializable
     {
         return collect($this->getUpdateFields($request, false))->mapWithKeys(function (Field $field) use ($request) {
             return $field->getUpdateRules($request);
-        })->values()->all();
+        })->all();
     }
 
     /**
@@ -184,6 +205,8 @@ abstract class Resource implements JsonSerializable
         return [
             'id' => $fields->whereInstanceOf(ID::class)->first() ?? ID::forModel($this->model()),
             'fields' => $fields->values()->all(),
+            'title' => $this->title(),
+            'subtitle' => $this->subtitle(),
         ];
     }
 
@@ -198,6 +221,8 @@ abstract class Resource implements JsonSerializable
         return [
             'id' => $fields->whereInstanceOf(ID::class)->first() ?? ID::forModel($this->model()),
             'fields' => $fields->values()->all(),
+            'title' => $this->title(),
+            'subtitle' => $this->subtitle(),
         ];
     }
 
@@ -269,7 +294,7 @@ abstract class Resource implements JsonSerializable
         );
 
         return $fields->filter(function (Field $field) use ($request, $includeReadonly) {
-            return $field->isShowOnCreate($request);
+            return $field->isShowOnCreate($request) && $field->attribute != '__COMPUTED__';
         })->each(function (Field $field) {
             $field->resolve($this->model());
         });
@@ -291,7 +316,7 @@ abstract class Resource implements JsonSerializable
         );
 
         return $fields->filter(function (Field $field) use ($request, $includeReadonly) {
-            return $field->isShowOnUpdate($request, $this->model());
+            return $field->isShowOnUpdate($request, $this->model()) && $field->attribute != '__COMPUTED__';
         })->each(function (Field $field) {
             $field->resolve($this->model());
         });

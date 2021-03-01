@@ -1,23 +1,30 @@
 <template>
-    <div class="mb-3">
-        <label class="form-label"
-               :for="fieldId">
+    <field-wrapper>
+        <field-label :for="field.attribute"
+                     :required="field.required">
             {{ field.name }}
-            <span v-if="field.required"
-                  class="text-danger">
-                *
-            </span>
-        </label>
+        </field-label>
         <slot/>
-        <div v-if="field.help"
-             :id="`${fieldId}-help`"
-             class="form-text"
-             v-html="field.help"/>
-    </div>
+        <field-errors v-if="hasErrors">
+            {{ firstError }}
+        </field-errors>
+        <field-help v-if="field.help"
+                    :id="`${field.attribute}-help`">
+            {{ field.help }}
+        </field-help>
+    </field-wrapper>
 </template>
 
 <script>
+import FieldHelp from './FieldHelp.vue';
+import FieldLabel from './FieldLabel.vue';
+import FieldErrors from './FieldErrors.vue';
+import FieldWrapper from './FieldWrapper.vue';
+import formFieldErrors from '../../mixins/formFieldErrors';
+
 export default {
+    mixins: [formFieldErrors],
+
     props: {
         field: {
             type: Object,
@@ -25,10 +32,11 @@ export default {
         }
     },
 
-    computed: {
-        fieldId () {
-            return `${this.field.attribute}-field`;
-        }
+    components: {
+        FieldHelp,
+        FieldLabel,
+        FieldErrors,
+        FieldWrapper,
     }
 };
 </script>

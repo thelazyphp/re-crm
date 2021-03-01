@@ -1,49 +1,41 @@
 <template>
-    <base-field :field="field">
-        <input :id="fieldId"
+    <base-field :field="field"
+                :errors="errors">
+        <input :id="field.attribute"
                v-model="value"
                v-bind="attributes"
                class="form-control"
-               :aria-describedby="!field.help ? null : `${fieldId}-help`"/>
+               :readonly="field.readonly"
+               :list="field.suggestions.length ? `${field.attribute}-list` : null"
+               :aria-describedby="field.help ? `${field.attribute}-help` : null"/>
+        <datalist v-if="field.suggestions.length"
+                  :id="`${field.attribute}-list`">
+            <option v-for="(suggestion, index) in field.suggestions"
+                    :key="index"
+                    :value="suggestion"/>
+        </datalist>
     </base-field>
 </template>
 
 <script>
-export default {
-    props: {
-        field: {
-            type: Object,
-            required: true
-        }
-    },
+import BaseField from './BaseField.vue';
+import formField from '../../mixins/formField';
+import formFieldErrors from '../../mixins/formFieldErrors';
 
-    data () {
-        return {
-            value: ''
-        }
+export default {
+    mixins: [formField, formFieldErrors],
+
+    components: {
+        BaseField,
     },
 
     computed: {
-        fieldId () {
-            return `${this.field.attribute}-field`;
-        },
-
         attributes () {
             return {
+                class: this.errorClass,
                 type: this.field.meta.type || 'text',
-                disabled: this.field.readonly || false,
                 placeholder: this.field.meta.placeholder || this.field.name
             };
-        }
-    },
-
-    created () {
-        this.value = this.field.value || this.field.default || '';
-    },
-
-    methods: {
-        fill (data) {
-            data.append(this.field.attribute, this.value);
         }
     }
 };

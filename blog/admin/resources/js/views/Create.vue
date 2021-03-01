@@ -19,11 +19,17 @@
                       @submit.prevent="handleSubmit">
                     <fieldset :disabled="submitting">
                         <component v-for="(field, index) in fields"
-                                   :is="field.component"
+                                   :is="`form-${field.component}`"
                                    :key="index"
-                                   :field="field"/>
+                                   :field="field"
+                                   :errors="errors"/>
                         <div class="text-end">
                             <button class="btn btn-primary"
+                                    type="button"
+                                    @click="$router.back()">
+                                Back
+                            </button>
+                            <button class="btn btn-primary ms-2"
                                     type="submit">
                                 Create {{ resourceInfo.label }}
                             </button>
@@ -37,13 +43,15 @@
 
 <script>
 import axios from 'axios';
+import Errors from '../helpers/Errors';
 
 export default {
     data () {
         return {
             loading: false,
+            submitting: false,
             fields: [],
-            submitting: false
+            errors: new Errors()
         };
     },
 
@@ -53,7 +61,7 @@ export default {
         },
 
         resourceInfo () {
-            return window.config.resources.find(item => item.name === this.resourceName);
+            return window.config.resources.find(resource => resource.name === this.resourceName);
         }
     },
 
@@ -74,6 +82,8 @@ export default {
 
                 this.fields = fields;
             } catch (error) {
+                //
+
                 console.log(error);
             } finally {
                 this.loading = false;
@@ -82,11 +92,28 @@ export default {
 
         async handleSubmit() {
             this.submitting = true;
+            this.errors.clear();
 
             try {
-                //
+                const data = {};
+
+                this.fields.forEach(field => {
+                    field.fill(data);
+                });
+
+                await axios.post(`/resources/${this.resourceName}`, data);
+
+                this.$router.push({
+                    name: 'index'
+                });
             } catch (error) {
                 console.log(error);
+
+                if (error.response.status === 422) {
+                    this.errors = new Errors(
+                        error.response.data.errors
+                    );
+                }
             } finally {
                 this.submitting = false;
             }
