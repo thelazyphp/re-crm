@@ -5,7 +5,7 @@
                   v-model="value"
                   v-bind="attributes"
                   class="form-control"
-                  :readonly="field.readonly"
+                  :disabled="field.readonly"
                   :aria-describedby="field.help ? `${field.attribute}-help` : null"></textarea>
     </base-field>
 </template>

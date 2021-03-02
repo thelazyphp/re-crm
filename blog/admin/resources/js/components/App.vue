@@ -19,7 +19,8 @@
 				</button>
 				<div id="navbarSupportedContent"
 					 class="collapse navbar-collapse">
-					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- mb-2 mb-lg-0 -->
+					<ul class="navbar-nav me-auto">
 						<li v-if="resources.length"
                             class="nav-item dropdown">
 							<a id="navbarDropdown"
@@ -40,7 +41,8 @@
                                                      params: {
                                                          resourceName: resource.name
                                                      }
-                                                 }">
+                                                 }"
+                                                 :aria-current="$route.name === 'index' && $route.params.resourceName === resource.name ? 'page' : null">
                                         {{ resource.pluralLabel }}
                                     </router-link>
                                 </li>

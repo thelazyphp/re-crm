@@ -5,6 +5,7 @@
                v-bind="attributes"
                class="form-check-input"
                type="checkbox"
+               :disabled="field.readonly"
                :aria-describedby="field.help ? `${field.attribute}-help` : null"/>
         <label class="form-check-label"
                :for="field.attribute">

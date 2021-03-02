@@ -1,7 +1,7 @@
 <template>
-    <p>
+    <div>
         {{ field.value }}
-    </p>
+    </div>
 </template>
 
 <script>

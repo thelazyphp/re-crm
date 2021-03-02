@@ -4,7 +4,7 @@
         <i class="far fa-check-circle"></i>
     </span>
     <span v-else
-          class="text-secondary">
+          class="text-danger">
         <i class="far fa-times-circle"></i>
     </span>
 </template>

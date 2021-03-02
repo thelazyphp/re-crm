@@ -1,7 +1,7 @@
 import Dashboard from '../views/Dashboard.vue';
 import Index from '../views/Index.vue';
-import Show from '../views/Show.vue';
 import Create from '../views/Create.vue';
+import Show from '../views/Show.vue';
 import Update from '../views/Update.vue';
 
 export default [

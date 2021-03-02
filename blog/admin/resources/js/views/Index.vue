@@ -3,8 +3,16 @@
         <h4 class="mb-4">
             {{ resourceInfo.pluralLabel }}
         </h4>
-        <div class="text-end mb-4">
-            <router-link class="btn btn-primary"
+        <div class="d-flex flex-column flex-sm-row justify-content-between mb-4">
+            <div class="row row-cols-auto">
+                <div class="col-12">
+                    <input v-model="search"
+                           class="form-control"
+                           type="search"
+                           placeholder="Search"/>
+                </div>
+            </div>
+            <router-link class="btn btn-primary mt-3 mt-sm-0"
                          :to="{
                              name: 'create',
                              params: {
@@ -25,20 +33,19 @@
                 </div>
             </div>
         </template>
-        <template v-else-if="resources.length">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <resources-table :resources="resources"
-                                     :resource-name="resourceName"
-                                     :resource-info="resourceInfo"
-                                     @delete-resource="handleDeleteResource"/>
-                </div>
-            </div>
-        </template>
-        <template v-else>
+        <template v-else-if="!resources.length">
             <p class="text-center">
                 No {{ resourceInfo.pluralLabel }} Found.
             </p>
+        </template>
+        <template v-else>
+            <resources-table :sort="sort"
+                             :order="order"
+                             :resources="resources"
+                             :resource-name="resourceName"
+                             :resource-info="resourceInfo"
+                             @sort-resources="handleSortResources"
+                             @delete-resource="handleDeleteResource"/>
         </template>
     </div>
 </template>
@@ -55,6 +62,9 @@ export default {
     data () {
         return {
             loading: false,
+            search: '',
+            sort: null,
+            order: null,
             resources: [],
             selectedResources: []
         };
@@ -82,14 +92,22 @@ export default {
 
     methods: {
         async fetchResources () {
+            this.selectedResources = [];
             this.loading = true;
+
+            const params = {
+                sort: this.sort,
+                order: this.order
+            };
 
             try {
                 const {
                     data: {
                         resources
                     }
-                } = await axios.get(`/resources/${this.resourceName}`);
+                } = await axios.get(`/resources/${this.resourceName}`, {
+                    params
+                });
 
                 this.resources = resources;
             } catch (error) {
@@ -101,10 +119,24 @@ export default {
             }
         },
 
+        async handleSortResources (event) {
+            this.sort = event.sort;
+            this.order = event.order;
+            await this.fetchResources();
+        },
+
         async handleDeleteResource (resource) {
-            if (confirm(`Delete ${resourceInfo.label}?`)) {
-                await axios.delete(`/resources/${this.resourceName}/${resource.id.value}`);
-                this.resources.splice(this.resources.findIndex(item => item.id.value === resource.id.value), 1);
+            if (confirm(`Delete ${this.resourceInfo.label}?`)) {
+                try {
+                    await axios.delete(`/resources/${this.resourceName}/${resource.id.value}`);
+                    const index = this.resources.findIndex(item => item.id.value === resource.id.value);
+                    this.resources.splice(index, 1);
+                    this.selectedResources.splice(index, 1);
+                } catch (error) {
+                    //
+
+                    console.log(error);
+                }
             }
         }
     }

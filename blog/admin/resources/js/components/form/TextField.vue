@@ -5,7 +5,7 @@
                v-model="value"
                v-bind="attributes"
                class="form-control"
-               :readonly="field.readonly"
+               :disabled="field.readonly"
                :list="field.suggestions.length ? `${field.attribute}-list` : null"
                :aria-describedby="field.help ? `${field.attribute}-help` : null"/>
         <datalist v-if="field.suggestions.length"

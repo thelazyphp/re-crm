@@ -15,12 +15,12 @@
         </template>
         <template v-else>
             <div class="text-end mb-4">
-                <button class="btn btn-primary mx-1"
+                <button class="btn btn-secondary"
                         type="button"
                         @click="$router.back()">
                     Back
                 </button>
-                <router-link class="btn btn-primary mx-1"
+                <router-link class="btn btn-primary ms-2"
                              :to="{
                                  name: 'update',
                                  params: {
@@ -28,34 +28,32 @@
                                      resourceName
                                  }
                              }"
+                             role="button"
                              :title="`Edit ${resourceInfo.label}`">
                     <i class="far fa-edit"></i>
                 </router-link>
-                <a class="btn btn-primary mx-1"
-                   href=""
-                   :title="`Delete ${resourceInfo.label}`">
+                <button class="btn btn-primary ms-2"
+                        type="button"
+                        :title="`Delete ${resourceInfo.label}`"
+                        @click="handleDeleteResource()">
                     <i class="far fa-trash-alt"></i>
-                </a>
+                </button>
             </div>
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li v-for="(field, index) in resource.fields"
-                            :key="index"
-                            class="list-group-item">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <strong>
-                                        {{ field.name }}
-                                    </strong>
-                                </div>
-                                <div class="col-sm-9">
-                                    <component :is="`detail-${field.component}`"
-                                               :field="field"/>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+                    <dl class="row">
+                        <template v-for="(field, index) in resource.fields">
+                            <dt class="col-sm-2"
+                                :key="`${field.attribute}-name-${index}`">
+                                {{ field.name }}
+                            </dt>
+                            <dd class="col-sm-10"
+                                :key="`${field.attribute}-value-${index}`">
+                                <component :is="`show-${field.component}`"
+                                           :field="field"/>
+                            </dd>
+                        </template>
+                    </dl>
                 </div>
             </div>
         </template>
@@ -74,12 +72,12 @@ export default {
     },
 
     computed: {
-        resourceId () {
-            return this.$route.params.resourceId;
-        },
-
         resourceName () {
             return this.$route.params.resourceName;
+        },
+
+        resourceId () {
+            return this.$route.params.resourceId;
         },
 
         resourceInfo () {
@@ -107,6 +105,25 @@ export default {
                 console.log(error);
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async handleDeleteResource () {
+            if (confirm(`Delete ${this.resourceInfo.label}?`)) {
+                try {
+                    await axios.delete(`/resources/${this.resourceName}/${this.resourceId}`);
+
+                    this.$router.push({
+                        name: 'index',
+                        params: {
+                            resourceName: this.resourceName
+                        }
+                    });
+                } catch (error) {
+                    //
+
+                    console.log(error);
+                }
             }
         }
     }

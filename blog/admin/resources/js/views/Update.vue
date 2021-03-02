@@ -14,7 +14,7 @@
             </div>
         </template>
         <template v-else>
-            <div class="card border-0 shadow-sm mb-4">
+            <div class="card border-0 shadow-sm">
                 <form class="card-body"
                       @submit.prevent="handleSubmit">
                     <fieldset :disabled="submitting">
@@ -24,7 +24,7 @@
                                    :field="field"
                                    :errors="errors"/>
                         <div class="text-end">
-                            <button class="btn btn-primary"
+                            <button class="btn btn-secondary"
                                     type="button"
                                     @click="$router.back()">
                                 Back
@@ -56,12 +56,12 @@ export default {
     },
 
     computed: {
-        resourceId () {
-            return this.$route.params.resourceId;
-        },
-
         resourceName () {
             return this.$route.params.resourceName;
+        },
+
+        resourceId () {
+            return this.$route.params.resourceId;
         },
 
         resourceInfo () {
@@ -105,11 +105,13 @@ export default {
                     field.fill(data);
                 });
 
-                await axios.put(`/resources/${this.resourceName}/${this.resourceId}`, data);
+                const {
+                    data: {
+                        redirectTo
+                    }
+                } = await axios.put(`/resources/${this.resourceName}/${this.resourceId}`, data);
 
-                this.$router.push({
-                    name: 'index'
-                });
+                this.$router.push(redirectTo);
             } catch (error) {
                 console.log(error);
 
