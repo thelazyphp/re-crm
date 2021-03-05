@@ -43,16 +43,16 @@ abstract class Field implements JsonSerializable
     protected $sortable = false;
 
     /**
-     * @var callable|bool
-     */
-    protected $nullable = false;
-
-    /**
      * @var callable|array
      */
     protected $asNull = [
         '',
     ];
+
+    /**
+     * @var callable|bool
+     */
+    protected $nullable = false;
 
     /**
      * @var callable|bool
@@ -303,6 +303,19 @@ abstract class Field implements JsonSerializable
     }
 
     /**
+     * @param  callable|array|mixed  $asNull
+     * @return $this
+     */
+    public function asNull($asNull)
+    {
+        $this->asNull = is_array($asNull) || is_callable($asNull)
+            ? $asNull
+            : func_get_args();
+
+        return $this;
+    }
+
+    /**
      * @param  callable|bool  $nullable
      * @param  callable|array|null  $asNull
      * @return $this
@@ -314,19 +327,6 @@ abstract class Field implements JsonSerializable
         if (! is_null($asNull)) {
             $this->asNull($asNull);
         }
-
-        return $this;
-    }
-
-    /**
-     * @param  callable|array|mixed  $values
-     * @return $this
-     */
-    public function asNull($values)
-    {
-        $this->asNull = is_array($values) || is_callable($values)
-            ? $values
-            : func_get_args();
 
         return $this;
     }
@@ -388,8 +388,6 @@ abstract class Field implements JsonSerializable
 
     /**
      * @param  callable|array|mixed  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
      * @return $this
      */
     public function rules($rules)
@@ -416,8 +414,6 @@ abstract class Field implements JsonSerializable
 
     /**
      * @param  callable|array|mixed  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
      * @return $this
      */
     public function createRules($rules)
@@ -446,8 +442,6 @@ abstract class Field implements JsonSerializable
 
     /**
      * @param  callable|array|mixed  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
      * @return $this
      */
     public function updateRules($rules)

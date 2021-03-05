@@ -49,11 +49,11 @@ class Select extends Field
 
         return $this->withMeta([
             'options' => collect($options)->map(function ($value, $key) {
-                    return [
-                        'value' => $key,
-                        'label' => $value,
-                    ];
-                })->values()->all(),
+                return [
+                    'value' => $key,
+                    'label' => $value,
+                ];
+            })->values()->all(),
         ]);
     }
 
@@ -65,8 +65,7 @@ class Select extends Field
     {
         if ($displayUsingLabels) {
             $this->displayUsing(function ($value) {
-                return collect($this->options)->where('value', $value)
-                    ->first()['label'] ?? $value;
+                return collect($this->options)->where('value', $value)->first()['label'] ?? $value;
             });
         }
 
