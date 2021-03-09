@@ -7,6 +7,7 @@ use Admin\Fields\ID;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use JsonSerializable;
 
@@ -21,6 +22,16 @@ abstract class Resource implements JsonSerializable
      * @var string
      */
     public static $title = 'id';
+
+    /**
+     * @var bool
+     */
+    public static $smallTable = false;
+
+    /**
+     * @var bool
+     */
+    public static $borderedTable = false;
 
     /**
      * @var bool
@@ -123,6 +134,89 @@ abstract class Resource implements JsonSerializable
 
     /**
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Support\Collection|null  $fields
+     * @return array
+     */
+    public function getCreateRules(Request $request, ?Collection $fields = null)
+    {
+        $fields = $fields ?? $this->getCreateFieldsExceptReadonly($request);
+
+        return collect($fields)->mapWithKeys(function (Field $field) use ($request) {
+            return $field->getCreateRules($request);
+        })->all();
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Support\Collection|null  $fields
+     * @return array
+     */
+    public function getUpdateRules(Request $request, ?Collection $fields = null)
+    {
+        $fields = $fields ?? $this->getUpdateFieldsExceptReadonly($request);
+
+        return collect($fields)->mapWithKeys(function (Field $field) use ($request) {
+            return $field->getUpdateRules($request);
+        })->all();
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  bool  $forUpdate
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function fill(Request $request, $forUpdate = false)
+    {
+        $fields = $forUpdate
+            ? $this->getUpdateFieldsExceptReadonly($request)
+            : $this->getCreateFieldsExceptReadonly($request);
+
+        $validator = Validator::make(
+            $request->all(),
+            $forUpdate
+                ? $this->getUpdateRules($request, $fields)
+                : $this->getCreateRules($request, $fields)
+        );
+
+        $validator->validate();
+
+        $fields->each->fill(
+            $request, $this->model()
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function serializeForIndex(Request $request)
+    {
+        $fields = $this->getIndexFields($request);
+
+        return [
+            'id' => $fields->whereInstanceOf(ID::class) ?? ID::forModel($this->model()),
+            'fields' => $fields->values()->all(),
+        ];
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function serializeForShow(Request $request)
+    {
+        $fields = $this->getShowFields($request);
+
+        return [
+            'id' => $fields->whereInstanceOf(ID::class) ?? ID::forModel($this->model()),
+            'fields' => $fields->values()->all(),
+        ];
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     abstract public function fields(Request $request): array;
@@ -186,6 +280,7 @@ abstract class Resource implements JsonSerializable
 
         return tap(collect(call_user_func([$this, $method], $request) ?: [])->filter(function ($field) use ($request) {
             return $field instanceof Field &&
+                ! $field->isComputed() &&
                 $field->isDisplayOnCreate($request) &&
                 ! $field instanceof ID && $field->attribute != $this->model()->getKeyName();
         }), function (Collection $fields) {
@@ -216,6 +311,7 @@ abstract class Resource implements JsonSerializable
 
         return tap(collect(call_user_func([$this, $method], $request) ?: [])->filter(function ($field) use ($request) {
             return $field instanceof Field &&
+                ! $field->isComputed() &&
                 $field->isDisplayOnUpdate($request, $this->model()) &&
                 ! $field instanceof ID && $field->attribute != $this->model()->getKeyName();
         }), function (Collection $fields) {
