@@ -3,6 +3,7 @@
 namespace Admin;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 abstract class Admin
 {
@@ -41,6 +42,19 @@ abstract class Admin
     }
 
     /**
+     * @param  string  $value
+     * @return string
+     */
+    public static function humanize($value)
+    {
+        return Str::title(
+            Str::snake(
+                $value, ' '
+            )
+        );
+    }
+
+    /**
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
@@ -53,13 +67,14 @@ abstract class Admin
             'locale' => static::locale(),
             'resources' => collect(static::$resources)->map(function ($resource) {
                 return [
-                    'showInNavigation' => $resource::$showInNavigation,
+                    'displayInNavigation' => $resource::$displayInNavigation,
+                    'key' => $resource::key(),
                     'name' => $resource::name(),
-                    'label' => $resource::label(),
-                    'pluralLabel' => $resource::pluralLabel(),
+                    'pluralName' => $resource::pluralName(),
+                    'smallTable' => $resource::$smallTable,
+                    'borderedTable' => $resource::$borderedTable,
                 ];
-            }),
-            'apiUrl' => config('app.url').static::path().'/api',
+            })
         ];
     }
 
@@ -77,13 +92,13 @@ abstract class Admin
     }
 
     /**
-     * @param  string  $name
+     * @param  string  $key
      * @return string|null
      */
-    public static function findResourceByName($name)
+    public static function findResourceByKey($key)
     {
-        return collect(static::$resources)->first(function ($resource) use ($name) {
-            return $resource::name() == $name;
+        return collect(static::$resources)->first(function ($resource) use ($key) {
+            return $resource::key() == $key;
         });
     }
 }

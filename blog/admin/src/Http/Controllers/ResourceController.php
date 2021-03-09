@@ -12,18 +12,27 @@ class ResourceController extends Controller
      * Display a listing of the resource.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $resourceName)
+    public function index(Request $request, $resourceKey)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);
         }
 
-        $models = $resource::$model::all();
+        $query = $resource::$model::query();
+
+        if ($request->filled('sort')) {
+            $query->orderBy(
+                $request->sort,
+                $request->input('order', 'asc')
+            );
+        }
+
+        $models = $query->get();
 
         return response()->json([
             'resources' => $models->mapInto($resource)->map->serializeForIndex($request),
@@ -34,12 +43,12 @@ class ResourceController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $resourceName)
+    public function store(Request $request, $resourceKey)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);
@@ -53,7 +62,7 @@ class ResourceController extends Controller
 
         return response()->json([
             'resource' => $resource->model(),
-            'redirectTo' => "/resources/{$resource::name()}",
+            'redirectTo' => "/resources/{$resource::key()}",
         ]);
     }
 
@@ -61,13 +70,13 @@ class ResourceController extends Controller
      * Display the specified resource.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @param  mixed  $resourceId
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $resourceName, $resourceId)
+    public function show(Request $request, $resourceKey, $resourceId)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);
@@ -78,7 +87,7 @@ class ResourceController extends Controller
         $resource = $resource::forModel($model);
 
         return response()->json([
-            'resource' => $resource->serializeForDetail($request),
+            'resource' => $resource->serializeForShow($request),
         ]);
     }
 
@@ -86,13 +95,13 @@ class ResourceController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @param  mixed  $resourceId
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $resourceName, $resourceId)
+    public function update(Request $request, $resourceKey, $resourceId)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);
@@ -108,7 +117,7 @@ class ResourceController extends Controller
 
         return response()->json([
             'resource' => $resource->model(),
-            'redirectTo' => "/resources/{$resource::name()}",
+            'redirectTo' => "/resources/{$resource::key()}",
         ]);
     }
 
@@ -116,13 +125,13 @@ class ResourceController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @param  mixed  $resourceId
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $resourceName, $resourceId)
+    public function destroy(Request $request, $resourceKey, $resourceId)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);
@@ -133,7 +142,7 @@ class ResourceController extends Controller
         $model->delete();
 
         return response()->json([
-            'redirectTo' => "/resources/{$resource::name()}",
+            'redirectTo' => "/resources/{$resource::key()}",
         ], 204);
     }
 }

@@ -10,9 +10,32 @@ class Select extends Field
     public $component = 'select-field';
 
     /**
-     * @var array
+     * @var bool
      */
-    protected $options = [];
+    public $searchable = false;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(
+            parent::jsonSerialize(), [
+                'searchable' => $this->searchable,
+            ]
+        );
+    }
+
+    /**
+     * @param  bool  $searchable
+     * @return $this
+     */
+    public function searchable($searchable = true)
+    {
+        $this->searchable = $searchable;
+
+        return $this;
+    }
 
     /**
      * @param  callable|array  $options
@@ -24,14 +47,14 @@ class Select extends Field
             $options = call_user_func($options) ?: [];
         }
 
-        $this->options = collect($options)->map(function ($value, $key) {
-            return [
-                'value' => $key,
-                'label' => $value,
-            ];
-        })->values()->all();
-
-        return $this;
+        return $this->withMeta([
+            'options' => collect($options)->map(function ($value, $key) {
+                return [
+                    'value' => $key,
+                    'label' => $value,
+                ];
+            })->values()->all(),
+        ]);
     }
 
     /**
@@ -42,23 +65,10 @@ class Select extends Field
     {
         if ($displayUsingLabels) {
             $this->displayUsing(function ($value) {
-                return collect($this->options)->where('value', $value)
-                    ->first()['label'] ?? $value;
+                return collect($this->meta['options'])->where('value', $value)->first()['label'] ?? $value;
             });
         }
 
         return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function jsonSerialize()
-    {
-        return array_merge(
-            parent::jsonSerialize(), [
-                'options' => $this->options,
-            ]
-        );
     }
 }

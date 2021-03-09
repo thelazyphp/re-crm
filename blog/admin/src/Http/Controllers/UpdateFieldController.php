@@ -10,13 +10,13 @@ class UpdateFieldController extends Controller
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @param  mixed  $resourceId
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $resourceName, $resourceId)
+    public function index(Request $request, $resourceKey, $resourceId)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);

@@ -15,9 +15,16 @@ class Text extends Field
     public $asHtml = false;
 
     /**
-     * @var array
+     * {@inheritDoc}
      */
-    public $suggestions = [];
+    public function jsonSerialize()
+    {
+        return array_merge(
+            parent::jsonSerialize(), [
+                'asHtml' => $this->asHtml,
+            ]
+        );
+    }
 
     /**
      * @param  bool  $asHtml
@@ -36,23 +43,10 @@ class Text extends Field
      */
     public function suggestions($suggestions)
     {
-        $this->suggestions = ! is_callable($suggestions)
-            ? $suggestions
-            : call_user_func($suggestions);
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function jsonSerialize()
-    {
-        return array_merge(
-            parent::jsonSerialize(), [
-                'asHtml' => $this->asHtml,
-                'suggestions' => $this->suggestions,
-            ]
-        );
+        return $this->withMeta([
+            'suggestions' => ! is_callable($suggestions)
+                ? $suggestions
+                : call_user_func($suggestions),
+        ]);
     }
 }

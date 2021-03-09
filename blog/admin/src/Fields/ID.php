@@ -16,7 +16,7 @@ class ID extends Field
      */
     public static function make($name = 'ID', $attribute = 'id')
     {
-        return parent::make(
+        return new static(
             $name,
             $attribute
         );
@@ -28,14 +28,9 @@ class ID extends Field
      */
     public static function forModel(Model $model)
     {
-        $field = static::make(
-            'ID',
-            $model->getKeyName()
-        );
-
-        $field->resolve($model, true);
-
-        return $field;
+        return tap(static::make('ID', $model->getKeyName()), function (ID $id) use ($model) {
+            $id->resolve($model);
+        });
     }
 
     /**
@@ -48,8 +43,7 @@ class ID extends Field
             $attribute
         );
 
-        $this->hideFromCreate();
-        $this->hideFromUpdate();
+        $this->exceptOnForms();
     }
 
     /**

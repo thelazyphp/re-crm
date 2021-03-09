@@ -6,16 +6,11 @@ use Admin\Fields\Field;
 use Admin\Fields\ID;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use JsonSerializable;
 
-/**
- * @method array indexFields(\Illuminate\Http\Request $request)
- * @method array detailFields(\Illuminate\Http\Request $request)
- * @method array createFields(\Illuminate\Http\Request $request)
- * @method array updateFields(\Illuminate\Http\Request $request)
- */
 abstract class Resource implements JsonSerializable
 {
     /**
@@ -31,40 +26,22 @@ abstract class Resource implements JsonSerializable
     /**
      * @var bool
      */
-    public static $showInNavigation = true;
+    public static $smallTable = false;
+
+    /**
+     * @var bool
+     */
+    public static $borderedTable = false;
+
+    /**
+     * @var bool
+     */
+    public static $displayInNavigation = true;
 
     /**
      * @var \Illuminate\Database\Eloquent\Model
      */
-    public $resource;
-
-    /**
-     * @return string
-     */
-    public static function name()
-    {
-        return Str::plural(
-            Str::kebab(class_basename(get_called_class()))
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public static function label()
-    {
-        return Str::title(
-            Str::snake(class_basename(get_called_class()), ' ')
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public static function pluralLabel()
-    {
-        return Str::plural(static::label());
-    }
+    public $modelInstance;
 
     /**
      * @return \Illuminate\Database\Eloquent\Model
@@ -84,11 +61,45 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model|null  $resource
+     * @return string
      */
-    public function __construct(?Model $resource = null)
+    public static function key()
     {
-        $this->resource = $resource ?? static::newModel();
+        return Str::plural(
+            Str::kebab(
+                class_basename(
+                    get_called_class()
+                )
+            )
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public static function name()
+    {
+        return Admin::humanize(
+            class_basename(
+                get_called_class()
+            )
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public static function pluralName()
+    {
+        return Str::plural(static::name());
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     */
+    public function __construct(?Model $model = null)
+    {
+        $this->modelInstance = $model ?? static::newModel();
     }
 
     /**
@@ -97,8 +108,21 @@ abstract class Resource implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            //
+            'displayInNavigation' => static::$displayInNavigation,
+            'smallTable' => static::$smallTable,
+            'borderedTable' => static::$borderedTable,
+            'key' => static::key(),
+            'name' => static::name(),
+            'pluralName' => static::pluralName(),
         ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function model()
+    {
+        return $this->modelInstance;
     }
 
     /**
@@ -118,79 +142,57 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function model()
-    {
-        return $this->resource;
-    }
-
-    /**
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Support\Collection|null  $fields
      * @return array
      */
-    public function createRules(Request $request)
+    public function getCreateRules(Request $request, ?Collection $fields = null)
     {
-        return collect($this->getCreateFields($request, false))->mapWithKeys(function (Field $field) use ($request) {
+        $fields = $fields ?? $this->getCreateFields($request, true);
+
+        return collect($fields)->mapWithKeys(function (Field $field) use ($request) {
             return $field->getCreateRules($request);
         })->all();
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Support\Facades\Validator
-     */
-    public function validatorForCreate(Request $request)
-    {
-        return Validator::make(
-            $request->all(),
-            $this->createRules($request)
-        );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Support\Collection|null  $fields
      * @return array
      */
-    public function updateRules(Request $request)
+    public function getUpdateRules(Request $request, ?Collection $fields = null)
     {
-        return collect($this->getUpdateFields($request, false))->mapWithKeys(function (Field $field) use ($request) {
+        $fields = $fields ?? $this->getUpdateFields($request, true);
+
+        return collect($fields)->mapWithKeys(function (Field $field) use ($request) {
             return $field->getUpdateRules($request);
         })->all();
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Support\Facades\Validator
-     */
-    public function validatorForUpdate(Request $request)
-    {
-        return Validator::make(
-            $request->all(),
-            $this->updateRules($request)
-        );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
      * @param  bool  $forUpdate
      * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function fill(Request $request, $forUpdate = false)
     {
-        $validator = $forUpdate
-            ? $this->validatorForUpdate($request)
-            : $this->validatorForCreate($request);
+        $fields = $forUpdate
+            ? $this->getUpdateFields($request, true)
+            : $this->getCreateFields($request, true);
+
+        $validator = Validator::make(
+            $request->all(),
+            $forUpdate
+                ? $this->getUpdateRules($request, $fields)
+                : $this->getCreateRules($request, $fields)
+        );
 
         $validator->validate();
 
-        $fields = $forUpdate
-            ? $this->getUpdateFields($request, false)
-            : $this->getCreateFields($request, false);
-
         $fields->each->fill(
-            $request,
-            $this->model()
+            $request, $this->model()
         );
     }
 
@@ -205,8 +207,6 @@ abstract class Resource implements JsonSerializable
         return [
             'id' => $fields->whereInstanceOf(ID::class)->first() ?? ID::forModel($this->model()),
             'fields' => $fields->values()->all(),
-            'title' => $this->title(),
-            'subtitle' => $this->subtitle(),
         ];
     }
 
@@ -214,15 +214,13 @@ abstract class Resource implements JsonSerializable
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function serializeForDetail(Request $request)
+    public function serializeForShow(Request $request)
     {
-        $fields = $this->getDetailFields($request);
+        $fields = $this->getShowFields($request);
 
         return [
             'id' => $fields->whereInstanceOf(ID::class)->first() ?? ID::forModel($this->model()),
             'fields' => $fields->values()->all(),
-            'title' => $this->title(),
-            'subtitle' => $this->subtitle(),
         ];
     }
 
@@ -238,20 +236,15 @@ abstract class Resource implements JsonSerializable
      */
     public function getIndexFields(Request $request)
     {
-        $method = method_exists($this, 'indexFields') ? 'indexFields' : 'fields';
+        $method = ! method_exists($this, 'indexFields')
+            ? 'fields'
+            : 'indexFields';
 
-        $fields = collect(
-            call_user_func(
-                [$this, $method], $request
-            )
-        );
-
-        return $fields->filter(function (Field $field) use ($request) {
-            return $field->isShowOnIndex($request);
-        })->each(function (Field $field) {
-            $field->resolve(
-                $this->model(), true
-            );
+        return tap(collect(call_user_func([$this, $method], $request) ?: [])->filter(function ($field) use ($request) {
+            return $field instanceof Field &&
+                $field->isDisplayOnIndex($request, $this->model());
+        }), function (Collection $fields) {
+            $fields->each->resolve($this->model(), true);
         });
     }
 
@@ -259,66 +252,63 @@ abstract class Resource implements JsonSerializable
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Support\Collection
      */
-    public function getDetailFields(Request $request)
+    public function getShowFields(Request $request)
     {
-        $method = method_exists($this, 'detailFields') ? 'detailFields' : 'fields';
+        $method = ! method_exists($this, 'showFields')
+            ? 'fields'
+            : 'showFields';
 
-        $fields = collect(
-            call_user_func(
-                [$this, $method], $request
-            )
-        );
-
-        return $fields->filter(function (Field $field) use ($request) {
-            return $field->isShowOnDetail($request, $this->model());
-        })->each(function (Field $field) {
-            $field->resolve(
-                $this->model(), true
-            );
+        return tap(collect(call_user_func([$this, $method], $request) ?: [])->filter(function ($field) use ($request) {
+            return $field instanceof Field &&
+                $field->isDisplayOnShow($request, $this->model());
+        }), function (Collection $fields) {
+            $fields->each->resolve($this->model(), true);
         });
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  bool  $includeReadonly
+     * @param  bool  $exceptReadonly
      * @return \Illuminate\Support\Collection
      */
-    public function getCreateFields(Request $request, $includeReadonly = true)
+    public function getCreateFields(Request $request, $exceptReadonly = false)
     {
-        $method = method_exists($this, 'createFields') ? 'createFields' : 'fields';
+        $method = ! method_exists($this, 'createFields')
+            ? 'fields'
+            : 'createFields';
 
-        $fields = collect(
-            call_user_func(
-                [$this, $method], $request
-            )
-        );
-
-        return $fields->filter(function (Field $field) use ($request, $includeReadonly) {
-            return $field->isShowOnCreate($request) && $field->attribute != '__COMPUTED__';
-        })->each(function (Field $field) {
-            $field->resolve($this->model());
+        return tap(collect(call_user_func([$this, $method], $request) ?: [])->filter(function ($field) use ($request) {
+            return $field instanceof Field &&
+                ! $field->isComputed() &&
+                $field->isDisplayOnCreate($request) &&
+                ! $field instanceof ID && $field->attribute != $this->model()->getKeyName();
+        })->reject(function (Field $field) use ($request, $exceptReadonly) {
+            return $exceptReadonly && $field->isReadonly($request);
+        }), function (Collection $fields) {
+            $fields->each->resolve($this->model());
         });
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  bool  $includeReadonly
+     * @param  bool  $exceptReadonly
      * @return \Illuminate\Support\Collection
      */
-    public function getUpdateFields(Request $request, $includeReadonly = true)
+    public function getUpdateFields(Request $request, $exceptReadonly = false)
     {
-        $method = method_exists($this, 'updateFields') ? 'updateFields' : 'fields';
+        $method = ! method_exists($this, 'updateFields')
+            ? 'fields'
+            : 'updateFields';
 
-        $fields = collect(
-            call_user_func(
-                [$this, $method], $request
-            )
-        );
-
-        return $fields->filter(function (Field $field) use ($request, $includeReadonly) {
-            return $field->isShowOnUpdate($request, $this->model()) && $field->attribute != '__COMPUTED__';
-        })->each(function (Field $field) {
-            $field->resolve($this->model());
+        return tap(collect(call_user_func([$this, $method], $request) ?: [])->filter(function ($field) use ($request) {
+            return $field instanceof Field &&
+                ! $field->isComputed() &&
+                $field->isDisplayOnUpdate($request, $this->model()) &&
+                ! $field instanceof ID && $field->attribute != $this->model()->getKeyName();
+        })->reject(function (Field $field) use ($request, $exceptReadonly) {
+            return $exceptReadonly && $field->isReadonly($request);
+        }), function (Collection $fields) {
+            $fields->each->resolve($this->model());
         });
     }
 }

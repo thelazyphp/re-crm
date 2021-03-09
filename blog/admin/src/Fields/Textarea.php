@@ -19,7 +19,7 @@ class Textarea extends Field
             $attribute
         );
 
-        $this->hideFromIndex();
+        $this->exceptOnIndex();
     }
 
     /**
@@ -29,7 +29,9 @@ class Textarea extends Field
     public function rows($rows)
     {
         return $this->withMeta([
-            'rows' => $rows,
+            'attributes' => [
+                'rows' => $rows,
+            ],
         ]);
     }
 }

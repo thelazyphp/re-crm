@@ -10,12 +10,12 @@ class CreateFieldController extends Controller
 {
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  string  $resourceName
+     * @param  string  $resourceKey
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $resourceName)
+    public function index(Request $request, $resourceKey)
     {
-        $resource = Admin::findResourceByName($resourceName);
+        $resource = Admin::findResourceByKey($resourceKey);
 
         if (! $resource) {
             abort(404);

@@ -2,6 +2,7 @@
 
 namespace Admin\Fields;
 
+use Admin\Metable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -9,6 +10,8 @@ use JsonSerializable;
 
 abstract class Field implements JsonSerializable
 {
+    use Metable;
+
     /**
      * @var string
      */
@@ -20,29 +23,14 @@ abstract class Field implements JsonSerializable
     public $name;
 
     /**
-     * @var string
-     */
-    public $attribute;
-
-    /**
      * @var mixed
      */
     public $value;
 
     /**
-     * @var bool
-     */
-    public $sortable = false;
-
-    /**
      * @var string
      */
-    public $help;
-
-    /**
-     * @var array
-     */
-    public $meta = [];
+    public $attribute;
 
     /**
      * @var callable|mixed
@@ -50,11 +38,31 @@ abstract class Field implements JsonSerializable
     protected $default;
 
     /**
+     * @var callable|bool
+     */
+    protected $sortable = false;
+
+    /**
      * @var callable|array
      */
-    protected $nullValues = [
-        null, '',
+    protected $asNull = [
+        '',
     ];
+
+    /**
+     * @var callable|bool
+     */
+    protected $nullable = false;
+
+    /**
+     * @var callable|bool
+     */
+    protected $required = false;
+
+    /**
+     * @var callable|bool
+     */
+    protected $readonly = false;
 
     /**
      * @var callable|array
@@ -74,57 +82,42 @@ abstract class Field implements JsonSerializable
     /**
      * @var callable
      */
-    protected $fillCallback;
+    protected $computeUsing;
 
     /**
      * @var callable
      */
-    protected $resolveCallback;
+    protected $fillUsing;
 
     /**
      * @var callable
      */
-    protected $displayCallback;
+    protected $resolveUsing;
 
     /**
      * @var callable
      */
-    protected $attributeCallback;
+    protected $displayUsing;
 
     /**
      * @var callable|bool
      */
-    protected $readonly = false;
+    protected $displayOnIndex = true;
 
     /**
      * @var callable|bool
      */
-    protected $required = false;
+    protected $displayOnShow = true;
 
     /**
      * @var callable|bool
      */
-    protected $nullable = false;
+    protected $displayOnCreate = true;
 
     /**
      * @var callable|bool
      */
-    protected $showOnIndex = true;
-
-    /**
-     * @var callable|bool
-     */
-    protected $showOnDetail = true;
-
-    /**
-     * @var callable|bool
-     */
-    protected $showOnCreate = true;
-
-    /**
-     * @var callable|bool
-     */
-    protected $showOnUpdate = true;
+    protected $displayOnUpdate = true;
 
     /**
      * @param  string  $name
@@ -148,8 +141,8 @@ abstract class Field implements JsonSerializable
         $this->name = $name;
 
         if (is_callable($attribute)) {
-            $this->attribute = '__COMPUTED__';
-            $this->attributeCallback = $attribute;
+            $this->attribute = 'COMPUTED';
+            $this->computeUsing = $attribute;
         } else {
             $this->attribute = $attribute ?? Str::snake($name);
         }
@@ -163,136 +156,114 @@ abstract class Field implements JsonSerializable
         $request = request();
 
         return [
+            'meta' => $this->meta,
             'component' => $this->component,
             'name' => $this->name,
-            'attribute' => $this->attribute,
             'value' => $this->value,
-            'sortable' => $this->sortable,
-            'help' => $this->help,
-            'meta' => $this->meta,
-            'default' => $this->getDefault($request),
-            'readonly' => $this->isReadonly($request),
-            'required' => $this->isRequired($request),
+            'attribute' => $this->attribute,
+            'sortable' => $this->isSortable($request),
             'nullable' => $this->isNullable($request),
+            'required' => $this->isRequired($request),
+            'readonly' => $this->isReadonly($request),
         ];
     }
 
     /**
-     * @param  callable  $callback
+     * @return bool
+     */
+    public function isComputed()
+    {
+        return $this->attribute == 'COMPUTED' && is_callable($this->computeUsing);
+    }
+
+    /**
+     * @param  callable  $fillUsing
      * @return $this
      */
-    public function fillUsing(callable $callback)
+    public function fillUsing(callable $fillUsing)
     {
-        $this->fillCallback = $callback;
+        $this->fillUsing = $fillUsing;
 
         return $this;
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $resource
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-    public function fill(Request $request, Model $resource)
+    public function fill(Request $request, Model $model)
     {
-        if (is_callable($this->fillCallback)) {
+        if ($this->isComputed()) {
+            return;
+        }
+
+        if (is_callable($this->fillUsing)) {
             call_user_func(
-                $this->fillCallback, $request, $resource, $this->attribute
+                $this->fillUsing,
+                $request, $model, $this->attribute
             );
         } else {
             $value = $request->{$this->attribute};
 
-            $resource->{$this->attribute} = $this->isNullValue($value, $request)
+            $model->{$this->attribute} = $this->isNull($value, $request)
                 ? null
                 : $value;
         }
     }
 
     /**
-     * @param  callable  $callback
+     * @param  callable  $resolveUsing
      * @return $this
      */
-    public function resolveUsing(callable $callback)
+    public function resolveUsing(callable $resolveUsing)
     {
-        $this->resolveCallback = $callback;
+        $this->resolveUsing = $resolveUsing;
 
         return $this;
     }
 
     /**
-     * @param  callable  $callback
+     * @param  callable  $displayUsing
      * @return $this
      */
-    public function displayUsing(callable $callback)
+    public function displayUsing(callable $displayUsing)
     {
-        $this->displayCallback = $callback;
+        $this->displayUsing = $displayUsing;
 
         return $this;
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $resource
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  bool  $forDisplay
      * @return void
      */
-    public function resolve(Model $resource, $forDisplay = false)
+    public function resolve(Model $model, $forDisplay = false)
     {
-        if ($this->attribute == '__COMPUTED__') {
+        if ($this->isComputed()) {
             $this->value = call_user_func(
-                $this->attributeCallback, $resource
+                $this->computeUsing, $model
             );
-        } else {
-            $this->value = $resource->{$this->attribute};
 
-            if (is_callable($this->resolveCallback)) {
-                $this->value = call_user_func(
-                    $this->resolveCallback, $this->value, $resource, $this->attribute
-                );
-            }
-
-            if ($forDisplay && is_callable($this->displayCallback)) {
-                $this->value = call_user_func(
-                    $this->displayCallback, $this->value, $resource, $this->attribute
-                );
-            }
-        }
-    }
-
-    /**
-     * @param  string  $sortable
-     * @return $this
-     */
-    public function sortable($sortable = true)
-    {
-        if (! $this->attribute == '__COMPUTED__') {
-            $this->sortable = $sortable;
+            return;
         }
 
-        return $this;
-    }
+        $this->value = $model->{$this->attribute};
 
-    /**
-     * @param  string  $help
-     * @return $this
-     */
-    public function help($help)
-    {
-        $this->help = $help;
+        if (is_callable($this->resolveUsing)) {
+            $this->value = call_user_func(
+                $this->resolveUsing,
+                $this->value, $model, $this->attribute
+            );
+        }
 
-        return $this;
-    }
-
-    /**
-     * @param  array  $meta
-     * @return $this
-     */
-    public function withMeta(array $meta)
-    {
-        $this->meta = array_merge(
-            $this->meta, $meta
-        );
-
-        return $this;
+        if ($forDisplay && is_callable($this->displayUsing)) {
+            $this->value = call_user_func(
+                $this->displayUsing,
+                $this->value, $model, $this->attribute
+            );
+        }
     }
 
     /**
@@ -302,7 +273,20 @@ abstract class Field implements JsonSerializable
     public function placeholder($placeholder)
     {
         return $this->withMeta([
-            'placeholder' => $placeholder,
+            'attributes' => [
+                'placeholder' => $placeholder,
+            ],
+        ]);
+    }
+
+    /**
+     * @param  string  $help
+     * @return $this
+     */
+    public function help($help)
+    {
+        return $this->withMeta([
+            'help' => $help,
         ]);
     }
 
@@ -318,16 +302,120 @@ abstract class Field implements JsonSerializable
     }
 
     /**
-     * @param  callable|array|mixed  $values
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function getDefault(Request $request)
+    {
+        return ! is_callable($this->default)
+            ? $this->default
+            : call_user_func($this->default, $request);
+    }
+
+    /**
+     * @param  callable|bool  $sortable
      * @return $this
      */
-    public function nullValues($values)
+    public function sortable($sortable = true)
     {
-        $this->nullValues = is_array($values) || is_callable($values)
-            ? $values
+        $this->sortable = $sortable;
+
+        return $this;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function isSortable(Request $request)
+    {
+        return ! is_callable($this->sortable)
+            ? $this->sortable
+            : call_user_func($this->sortable, $request);
+    }
+
+    /**
+     * @param  callable|array|mixed  $asNull
+     * @return $this
+     */
+    public function asNull($asNull)
+    {
+        $this->asNull = is_array($asNull) || is_callable($asNull)
+            ? $asNull
             : func_get_args();
 
         return $this;
+    }
+
+    /**
+     * @param  callable|bool  $nullable
+     * @param  callable|array|null  $asNull
+     * @return $this
+     */
+    public function nullable($nullable = true, $asNull = null)
+    {
+        $this->nullable = $nullable;
+
+        if (! is_null($asNull)) {
+            $this->asNull($asNull);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function isNullable(Request $request)
+    {
+        return ! is_callable($this->nullable)
+            ? $this->nullable
+            : call_user_func($this->nullable, $request);
+    }
+
+    /**
+     * @param  callable|bool  $required
+     * @return $this
+     */
+    public function required($required = true)
+    {
+        $this->required = $required;
+
+        return $this;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function isRequired(Request $request)
+    {
+        return ! is_callable($this->required)
+            ? $this->required
+            : call_user_func($this->required, $request);
+    }
+
+    /**
+     * @param  callable|bool  $readonly
+     * @return $this
+     */
+    public function readonly($readonly = true)
+    {
+        $this->readonly = $readonly;
+
+        return $this;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function isReadonly(Request $request)
+    {
+        return ! is_callable($this->readonly)
+            ? $this->readonly
+            : call_user_func($this->readonly, $request);
     }
 
     /**
@@ -341,6 +429,19 @@ abstract class Field implements JsonSerializable
             : func_get_args();
 
         return $this;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function getRules(Request $request)
+    {
+        return [
+            $this->attribute => ! is_callable($this->rules)
+                ? $this->rules
+                : call_user_func($this->rules, $request)
+        ];
     }
 
     /**
@@ -366,9 +467,7 @@ abstract class Field implements JsonSerializable
             $this->getRules($request), [
                 $this->attribute => ! is_callable($this->createRules)
                     ? $this->createRules
-                    : call_user_func(
-                        $this->createRules, $request
-                    )
+                    : call_user_func($this->createRules, $request)
             ]
         );
     }
@@ -396,128 +495,18 @@ abstract class Field implements JsonSerializable
             $this->getRules($request), [
                 $this->attribute => ! is_callable($this->updateRules)
                     ? $this->updateRules
-                    : call_user_func(
-                        $this->updateRules, $request
-                    )
+                    : call_user_func($this->updateRules, $request)
             ]
         );
     }
 
     /**
-     * @param  callable|bool  $required
+     * @param  callable|bool  $displayOnIndex
      * @return $this
      */
-    public function required($required = true)
+    public function displayOnIndex($displayOnIndex = true)
     {
-        $this->required = $required;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isRequired(Request $request)
-    {
-        return ! is_callable($this->required)
-            ? $this->required
-            : call_user_func(
-                $this->required, $request
-            );
-    }
-
-    /**
-     * @param  callable|bool  $readonly
-     * @return $this
-     */
-    public function readonly($readonly = true)
-    {
-        $this->readonly = $readonly;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isReadonly(Request $request)
-    {
-        return ! is_callable($this->readonly)
-            ? $this->readonly
-            : call_user_func(
-                $this->readonly, $request
-            );
-    }
-
-    /**
-     * @param  callable|bool  $nullable
-     * @param  callable|array  $nullValues
-     * @return $this
-     */
-    public function nullable($nullable = true, $nullValues = null)
-    {
-        $this->nullable = $nullable;
-
-        if (! is_null($nullValues)) {
-            $this->nullValues($nullValues);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isNullable(Request $request)
-    {
-        return ! is_callable($this->nullable)
-            ? $this->nullable
-            : call_user_func(
-                $this->nullable, $request
-            );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function isShowOnIndex(Request $request)
-    {
-        return ! is_callable($this->showOnIndex)
-            ? $this->showOnIndex
-            : call_user_func(
-                $this->showOnIndex, $request
-            );
-    }
-
-    /**
-     * @param  callable|bool  $callback
-     * @return $this
-     */
-    public function showOnIndex($callback = true)
-    {
-        $this->showOnIndex = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  callable|bool  $callback
-     * @return $this
-     */
-    public function hideFromIndex($callback = true)
-    {
-        $this->showOnIndex = ! is_callable($callback)
-            ? ! $callback
-            : function () use ($callback) {
-                return call_user_func(
-                    $callback,
-                    func_get_args()
-                );
-            };
+        $this->displayOnIndex = $displayOnIndex;
 
         return $this;
     }
@@ -527,52 +516,65 @@ abstract class Field implements JsonSerializable
      */
     public function onlyOnIndex()
     {
-        $this->showOnDetail = $this->showOnCreate = $this->showOnUpdate = false;
+        $this->displayOnIndex = true;
+        $this->displayOnShow = false;
+        $this->displayOnCreate = false;
+        $this->displayOnUpdate = false;
 
-        $this->showOnIndex = true;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function exceptOnIndex()
+    {
+        $this->displayOnIndex = false;
+        $this->displayOnShow = true;
+        $this->displayOnCreate = true;
+        $this->displayOnUpdate = true;
+
+        return $this;
+    }
+
+    /**
+     * @param  callable|bool  $hideFromIndex
+     * @return $this
+     */
+    public function hideFromIndex($hideFromIndex = true)
+    {
+        $this->displayOnIndex = ! is_callable($hideFromIndex)
+            ? ! $hideFromIndex
+            : function () use ($hideFromIndex) {
+                return ! call_user_func(
+                    $hideFromIndex, func_get_args()
+                );
+            };
 
         return $this;
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $resource
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return bool
      */
-    public function isShowOnDetail(Request $request, Model $resource)
+    public function isDisplayOnIndex(Request $request, Model $model)
     {
-        return ! is_callable($this->showOnDetail)
-            ? $this->showOnDetail
+        return ! is_callable($this->displayOnIndex)
+            ? $this->displayOnIndex
             : call_user_func(
-                $this->showOnDetail, $request, $resource
+                $this->displayOnIndex, $request, $model
             );
     }
 
     /**
-     * @param  callable|bool  $callback
+     * @param  callable|bool  $displayOnShow
      * @return $this
      */
-    public function showOnDetail($callback = true)
+    public function displayOnShow($displayOnShow = true)
     {
-        $this->showOnDetail = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  callable|bool  $callback
-     * @return $this
-     */
-    public function hideFromDetail($callback = true)
-    {
-        $this->showOnDetail = ! is_callable($callback)
-        ? ! $callback
-        : function () use ($callback) {
-            return call_user_func(
-                $callback,
-                func_get_args()
-            );
-        };
+        $this->displayOnShow = $displayOnShow;
 
         return $this;
     }
@@ -580,53 +582,93 @@ abstract class Field implements JsonSerializable
     /**
      * @return $this
      */
-    public function onlyOnDetail()
+    public function onlyOnShow()
     {
-        $this->showOnIndex = $this->showOnCreate = $this->showOnUpdate = false;
+        $this->displayOnIndex = false;
+        $this->displayOnShow = true;
+        $this->displayOnCreate = false;
+        $this->displayOnUpdate = false;
 
-        $this->showOnDetail = true;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function exceptOnShow()
+    {
+        $this->displayOnIndex = true;
+        $this->displayOnShow = false;
+        $this->displayOnCreate = true;
+        $this->displayOnUpdate = true;
+
+        return $this;
+    }
+
+    /**
+     * @param  callable|bool  $hideFromShow
+     * @return $this
+     */
+    public function hideFromShow($hideFromShow = true)
+    {
+        $this->displayOnShow = ! is_callable($hideFromShow)
+            ? ! $hideFromShow
+            : function () use ($hideFromShow) {
+                return ! call_user_func(
+                    $hideFromShow, func_get_args()
+                );
+            };
 
         return $this;
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return bool
      */
-    public function isShowOnCreate(Request $request)
+    public function isDisplayOnShow(Request $request, Model $model)
     {
-        return ! is_callable($this->showOnCreate)
-            ? $this->showOnCreate
+        return ! is_callable($this->displayOnShow)
+            ? $this->displayOnShow
             : call_user_func(
-                $this->showOnCreate, $request
+                $this->displayOnShow, $request, $model
             );
     }
 
     /**
-     * @param  callable|bool  $callback
      * @return $this
      */
-    public function showOnCreate($callback = true)
+    public function onlyOnForms()
     {
-        $this->showOnCreate = $callback;
+        $this->displayOnIndex = false;
+        $this->displayOnShow = false;
+        $this->displayOnCreate = true;
+        $this->displayOnUpdate = true;
 
         return $this;
     }
 
     /**
-     * @param  callable|bool  $callback
      * @return $this
      */
-    public function hideFromCreate($callback = true)
+    public function exceptOnForms()
     {
-        $this->showOnCreate = ! is_callable($callback)
-        ? ! $callback
-        : function () use ($callback) {
-            return call_user_func(
-                $callback,
-                func_get_args()
-            );
-        };
+        $this->displayOnIndex = true;
+        $this->displayOnShow = true;
+        $this->displayOnCreate = false;
+        $this->displayOnUpdate = false;
+
+        return $this;
+    }
+
+    /**
+     * @param  callable|bool  $displayOnCreate
+     * @return $this
+     */
+    public function displayOnCreate($displayOnCreate = true)
+    {
+        $this->displayOnCreate = $displayOnCreate;
 
         return $this;
     }
@@ -636,52 +678,64 @@ abstract class Field implements JsonSerializable
      */
     public function onlyOnCreate()
     {
-        $this->showOnIndex = $this->showOnDetail = $this->showOnUpdate = false;
+        $this->displayOnIndex = false;
+        $this->displayOnShow = false;
+        $this->displayOnCreate = true;
+        $this->displayOnUpdate = false;
 
-        $this->showOnCreate = true;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function exceptOnCreate()
+    {
+        $this->displayOnIndex = true;
+        $this->displayOnShow = true;
+        $this->displayOnCreate = false;
+        $this->displayOnUpdate = true;
+
+        return $this;
+    }
+
+    /**
+     * @param  callable|bool  $hideFromCreate
+     * @return $this
+     */
+    public function hideFromCreate($hideFromCreate = true)
+    {
+        $this->displayOnCreate = ! is_callable($hideFromCreate)
+            ? ! $hideFromCreate
+            : function () use ($hideFromCreate) {
+                return ! call_user_func(
+                    $hideFromCreate, func_get_args()
+                );
+            };
 
         return $this;
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $resource
      * @return bool
      */
-    public function isShowOnUpdate(Request $request, Model $resource)
+    public function isDisplayOnCreate(Request $request)
     {
-        return ! is_callable($this->showOnUpdate)
-            ? $this->showOnUpdate
+        return ! is_callable($this->displayOnCreate)
+            ? $this->displayOnCreate
             : call_user_func(
-                $this->showOnUpdate, $request, $resource
+                $this->displayOnCreate, $request
             );
     }
 
     /**
-     * @param  callable|bool  $callback
+     * @param  callable|bool  $displayOnUpdate
      * @return $this
      */
-    public function showOnUpdate($callback = true)
+    public function displayOnUpdate($displayOnUpdate = true)
     {
-        $this->showOnUpdate = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  callable|bool  $callback
-     * @return $this
-     */
-    public function hideFromUpdate($callback = true)
-    {
-        $this->showOnUpdate = ! is_callable($callback)
-        ? ! $callback
-        : function () use ($callback) {
-            return call_user_func(
-                $callback,
-                func_get_args()
-            );
-        };
+        $this->displayOnUpdate = $displayOnUpdate;
 
         return $this;
     }
@@ -691,39 +745,56 @@ abstract class Field implements JsonSerializable
      */
     public function onlyOnUpdate()
     {
-        $this->showOnIndex = $this->showOnDetail = $this->showOnCreate = false;
+        $this->displayOnIndex = false;
+        $this->displayOnShow = false;
+        $this->displayOnCreate = false;
+        $this->displayOnUpdate = true;
 
-        $this->showOnUpdate = true;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function exceptOnUpdate()
+    {
+        $this->displayOnIndex = true;
+        $this->displayOnShow = true;
+        $this->displayOnCreate = true;
+        $this->displayOnUpdate = false;
+
+        return $this;
+    }
+
+    /**
+     * @param  callable|bool  $hideFromUpdate
+     * @return $this
+     */
+    public function hideFromUpdate($hideFromUpdate = true)
+    {
+        $this->displayOnUpdate = ! is_callable($hideFromUpdate)
+            ? ! $hideFromUpdate
+            : function () use ($hideFromUpdate) {
+                return ! call_user_func(
+                    $hideFromUpdate, func_get_args()
+                );
+            };
 
         return $this;
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
      */
-    protected function getDefault(Request $request)
+    public function isDisplayOnUpdate(Request $request, Model $model)
     {
-        return ! is_callable($this->default)
-            ? $this->default
+        return ! is_callable($this->displayOnUpdate)
+            ? $this->displayOnUpdate
             : call_user_func(
-                $this->default, $request
+                $this->displayOnUpdate, $request, $model
             );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    protected function getRules(Request $request)
-    {
-        return [
-            $this->attribute => ! is_callable($this->rules)
-                ? $this->rules
-                : call_user_func(
-                    $this->rules, $request
-                )
-        ];
     }
 
     /**
@@ -731,17 +802,18 @@ abstract class Field implements JsonSerializable
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function isNullValue($value, Request $request)
+    protected function isNull($value, Request $request)
     {
         if (! $this->isNullable($request)) {
             return false;
         }
 
-        return is_callable($this->nullValues)
-            ? call_user_func(
-                $this->nullValues, $value
-            ) : in_array(
-                $value, $this->nullValues, true
-            );
+        if ($value === null) {
+            return true;
+        }
+
+        return is_callable($this->asNull)
+            ? call_user_func($this->asNull, $value)
+            : in_array($value, $this->asNull, true);
     }
 }
