@@ -4,7 +4,9 @@
             <input class="form-check-input"
                    type="checkbox"
                    :title="`Check ${resourceInfo.name}`"
-                   :aria-label="`Check ${resourceInfo.name}`"/>
+                   :aria-label="`Check ${resourceInfo.name}`"
+                   :checked="checked"
+                   @change="handleCheck"/>
         </td>
         <td v-for="(field, index) in resource.fields"
             :key="index"
@@ -55,6 +57,11 @@ export default {
             required: true
         },
 
+        checked: {
+            type: Boolean,
+            default: false
+        },
+
         resourceKey: {
             type: String,
             required: true
@@ -63,6 +70,15 @@ export default {
         resourceInfo: {
             type: Object,
             required: true
+        }
+    },
+
+    methods: {
+        handleCheck(event) {
+            this.$emit('check', {
+                checked: event.target.checked,
+                resource: this.resource
+            });
         }
     }
 };

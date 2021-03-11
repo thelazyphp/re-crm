@@ -1,8 +1,8 @@
 <template>
     <span v-if="field.asHtml"
-          v-html="field.value"/>
+          v-html="field.value || '-'"/>
     <span v-else>
-        {{ field.value }}
+        {{ field.value || '-' }}
     </span>
 </template>
 

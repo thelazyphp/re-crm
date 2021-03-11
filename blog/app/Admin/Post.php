@@ -8,6 +8,8 @@ use Admin\Fields\Select;
 use Admin\Fields\Text;
 use Admin\Fields\Textarea;
 use Admin\Resource;
+use App\Admin\Actions\PublishPosts;
+use App\Admin\Actions\UnpublishPosts;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -38,6 +40,17 @@ class Post extends Resource
      * {@inheritDoc}
      */
     public static $displayInNavigation = true;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function actions(Request $request)
+    {
+        return [
+            PublishPosts::make(),
+            UnpublishPosts::make(),
+        ];
+    }
 
     /**
      * {@inheritDoc}

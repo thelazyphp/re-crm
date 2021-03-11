@@ -36,11 +36,11 @@
                 <div class="card-body">
                     <dl class="row">
                         <template v-for="(field, index) in resource.fields">
-                            <dt class="col-sm-2"
+                            <dt class="col-md-3 col-lg-2"
                                 :key="`field-name-${index}`">
                                 {{ field.name }}
                             </dt>
-                            <dd class="col-sm-10"
+                            <dd class="col-md-9 col-lg-10"
                                 :key="`field-value-${index}`">
                                 <component :is="`show-${field.component}`"
                                            :field="field"/>

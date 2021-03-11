@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h4 class="mb-4">
-            Edit {{ resourceInfo.label }}
+            Edit {{ resourceInfo.name }}
         </h4>
         <template v-if="loading">
             <v-loader/>
@@ -24,7 +24,7 @@
                             </button>
                             <button class="btn btn-primary ms-2"
                                     type="submit">
-                                Edit {{ resourceInfo.label }}
+                                Edit {{ resourceInfo.name }}
                             </button>
                         </div>
                     </fieldset>

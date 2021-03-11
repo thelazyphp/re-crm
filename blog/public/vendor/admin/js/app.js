@@ -4933,6 +4933,60 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ActionSelect.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ActionSelect.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _VSelect_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VSelect.vue */ "./resources/js/components/VSelect.vue");
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    VSelect: _VSelect_vue__WEBPACK_IMPORTED_MODULE_0__.default
+  },
+  props: {
+    actions: {
+      type: Array,
+      "default": function _default() {
+        return [];
+      }
+    }
+  },
+  data: function data() {
+    return {
+      selectedAction: ''
+    };
+  },
+  computed: {
+    options: function options() {
+      return this.actions.map(function (action) {
+        return {
+          value: action.name,
+          label: action.name
+        };
+      });
+    },
+    placeholder: function placeholder() {
+      return 'Choose an action...';
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/App.vue?vue&type=script&lang=js&":
 /*!**********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/App.vue?vue&type=script&lang=js& ***!
@@ -5073,27 +5127,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -5112,6 +5145,12 @@ __webpack_require__.r(__webpack_exports__);
     resources: {
       type: Array,
       required: true
+    },
+    checkedResources: {
+      type: Array,
+      "default": function _default() {
+        return [];
+      }
     },
     resourceKey: {
       type: String,
@@ -5191,11 +5230,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     resource: {
       type: Object,
       required: true
+    },
+    checked: {
+      type: Boolean,
+      "default": false
     },
     resourceKey: {
       type: String,
@@ -5204,6 +5249,14 @@ __webpack_require__.r(__webpack_exports__);
     resourceInfo: {
       type: Object,
       required: true
+    }
+  },
+  methods: {
+    handleCheck: function handleCheck(event) {
+      this.$emit('check', {
+        checked: event.target.checked,
+        resource: this.resource
+      });
     }
   }
 });
@@ -5340,6 +5393,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     errorClass: {
       type: Object
+    },
+    small: {
+      type: Boolean,
+      "default": false
     },
     readonly: {
       type: Boolean,
@@ -6202,7 +6259,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components_VLoader_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/VLoader.vue */ "./resources/js/components/VLoader.vue");
-/* harmony import */ var _components_ResourcesTable_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/ResourcesTable.vue */ "./resources/js/components/ResourcesTable.vue");
+/* harmony import */ var _components_ActionSelect_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/ActionSelect.vue */ "./resources/js/components/ActionSelect.vue");
+/* harmony import */ var _components_ResourcesTable_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/ResourcesTable.vue */ "./resources/js/components/ResourcesTable.vue");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -6259,13 +6317,58 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     VLoader: _components_VLoader_vue__WEBPACK_IMPORTED_MODULE_2__.default,
-    ResourcesTable: _components_ResourcesTable_vue__WEBPACK_IMPORTED_MODULE_3__.default
+    ActionSelect: _components_ActionSelect_vue__WEBPACK_IMPORTED_MODULE_3__.default,
+    ResourcesTable: _components_ResourcesTable_vue__WEBPACK_IMPORTED_MODULE_4__.default
   },
   data: function data() {
     return {
@@ -6275,7 +6378,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       sort: null,
       order: null,
       filters: [],
-      resources: []
+      actions: [],
+      resources: [],
+      checkedResources: []
     };
   },
   computed: {
@@ -6287,6 +6392,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return window.config.resources.find(function (resource) {
         return resource.key === _this.resourceKey;
+      });
+    },
+    checkedResourcesIds: function checkedResourcesIds() {
+      return this.checkedResources.map(function (resource) {
+        return resource.id.value;
       });
     }
   },
@@ -6339,16 +6449,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this4.initialLoading = true; //
-
+                _this4.initialLoading = true;
                 _context3.next = 3;
-                return _this4.fetchResources();
+                return _this4.fetchActions();
 
               case 3:
-                //
+                _context3.next = 5;
+                return _this4.fetchResources();
+
+              case 5:
                 _this4.initialLoading = false;
 
-              case 4:
+              case 6:
               case "end":
                 return _context3.stop();
             }
@@ -6356,75 +6468,90 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
-    fetchResources: function fetchResources() {
+    fetchActions: function fetchActions() {
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
-        var _yield$axios$get, resources;
+        var _yield$axios$get, actions;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _this5.loading = true;
-                _context4.prev = 1;
-                _context4.next = 4;
-                return axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/resources/".concat(_this5.resourceKey), {
-                  params: {
-                    q: _this5.search,
-                    sort: _this5.sort,
-                    order: _this5.order
-                  }
-                });
+                _context4.prev = 0;
+                _context4.next = 3;
+                return axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/resources/".concat(_this5.resourceKey, "/actions"));
 
-              case 4:
+              case 3:
                 _yield$axios$get = _context4.sent;
-                resources = _yield$axios$get.data.resources;
-                _this5.resources = resources;
-                _context4.next = 12;
+                actions = _yield$axios$get.data.actions;
+                _this5.actions = actions;
+                _context4.next = 11;
                 break;
 
-              case 9:
-                _context4.prev = 9;
-                _context4.t0 = _context4["catch"](1);
+              case 8:
+                _context4.prev = 8;
+                _context4.t0 = _context4["catch"](0);
                 //
                 console.log(_context4.t0);
 
-              case 12:
-                _context4.prev = 12;
-                _this5.loading = false;
-                return _context4.finish(12);
-
-              case 15:
+              case 11:
               case "end":
                 return _context4.stop();
             }
           }
-        }, _callee4, null, [[1, 9, 12, 15]]);
+        }, _callee4, null, [[0, 8]]);
       }))();
     },
-    handleSortResources: function handleSortResources(event) {
+    fetchResources: function fetchResources() {
       var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+        var _yield$axios$get2, resources;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this6.sort = event.sort;
-                _this6.order = event.order;
-                _context5.next = 4;
-                return _this6.fetchResources();
+                _this6.checkedResources = [];
+                _this6.loading = true;
+                _context5.prev = 2;
+                _context5.next = 5;
+                return axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/resources/".concat(_this6.resourceKey), {
+                  params: {
+                    q: _this6.search,
+                    sort: _this6.sort,
+                    order: _this6.order
+                  }
+                });
 
-              case 4:
+              case 5:
+                _yield$axios$get2 = _context5.sent;
+                resources = _yield$axios$get2.data.resources;
+                _this6.resources = resources;
+                _context5.next = 13;
+                break;
+
+              case 10:
+                _context5.prev = 10;
+                _context5.t0 = _context5["catch"](2);
+                //
+                console.log(_context5.t0);
+
+              case 13:
+                _context5.prev = 13;
+                _this6.loading = false;
+                return _context5.finish(13);
+
+              case 16:
               case "end":
                 return _context5.stop();
             }
           }
-        }, _callee5);
+        }, _callee5, null, [[2, 10, 13, 16]]);
       }))();
     },
-    handleDeleteResource: function handleDeleteResource(resource) {
+    handleSortResources: function handleSortResources(event) {
       var _this7 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
@@ -6432,41 +6559,82 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (!confirm("Delete ".concat(_this7.resourceInfo.name, "?"))) {
-                  _context6.next = 14;
-                  break;
-                }
+                _this7.sort = event.sort;
+                _this7.order = event.order;
+                _context6.next = 4;
+                return _this7.fetchResources();
 
-                _this7.loading = true;
-                _context6.prev = 2;
-                _context6.next = 5;
-                return axios__WEBPACK_IMPORTED_MODULE_1___default().delete("/api/resources/".concat(_this7.resourceKey, "/").concat(resource.id.value));
-
-              case 5:
-                _this7.resources.splice(_this7.resources.findIndex(function (item) {
-                  return item.id.value === resource.id.value;
-                }), 1);
-
-                _context6.next = 11;
-                break;
-
-              case 8:
-                _context6.prev = 8;
-                _context6.t0 = _context6["catch"](2);
-                //
-                console.log(_context6.t0);
-
-              case 11:
-                _context6.prev = 11;
-                _this7.loading = false;
-                return _context6.finish(11);
-
-              case 14:
+              case 4:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, null, [[2, 8, 11, 14]]);
+        }, _callee6);
+      }))();
+    },
+    handleCheckResource: function handleCheckResource(event) {
+      if (event.checked) {
+        this.checkedResources.push(event.resource);
+      } else {
+        this.checkedResources.splice(this.checkedResources.findIndex(function (resource) {
+          return resource === event.resource;
+        }), 1);
+      }
+    },
+    handleCheckAllResources: function handleCheckAllResources(event) {
+      if (event.target.checked) {
+        this.checkedResources = this.resources;
+      } else {
+        this.checkedResources = [];
+      }
+    },
+    handleDeleteResources: function handleDeleteResources(ids) {
+      var _this8 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                if (!confirm("Delete Selected ".concat(_this8.resourceInfo.pluralName, "?"))) {
+                  _context7.next = 15;
+                  break;
+                }
+
+                _this8.loading = true;
+                _context7.prev = 2;
+                _context7.next = 5;
+                return axios__WEBPACK_IMPORTED_MODULE_1___default().delete("/api/resources/".concat(_this8.resourceKey), {
+                  params: {
+                    resources: ids.join(',')
+                  }
+                });
+
+              case 5:
+                _context7.next = 7;
+                return _this8.fetchResources();
+
+              case 7:
+                _context7.next = 12;
+                break;
+
+              case 9:
+                _context7.prev = 9;
+                _context7.t0 = _context7["catch"](2);
+                //
+                console.log(_context7.t0);
+
+              case 12:
+                _context7.prev = 12;
+                _this8.loading = false;
+                return _context7.finish(12);
+
+              case 15:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, null, [[2, 9, 12, 15]]);
       }))();
     }
   }
@@ -30859,6 +31027,45 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ "./resources/js/components/ActionSelect.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/ActionSelect.vue ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ActionSelect_vue_vue_type_template_id_339159bd___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ActionSelect.vue?vue&type=template&id=339159bd& */ "./resources/js/components/ActionSelect.vue?vue&type=template&id=339159bd&");
+/* harmony import */ var _ActionSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ActionSelect.vue?vue&type=script&lang=js& */ "./resources/js/components/ActionSelect.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__.default)(
+  _ActionSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _ActionSelect_vue_vue_type_template_id_339159bd___WEBPACK_IMPORTED_MODULE_0__.render,
+  _ActionSelect_vue_vue_type_template_id_339159bd___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ActionSelect.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/App.vue":
 /*!*****************************************!*\
   !*** ./resources/js/components/App.vue ***!
@@ -31947,6 +32154,22 @@ component.options.__file = "resources/js/views/Update.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/ActionSelect.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/ActionSelect.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ActionSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ActionSelect.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ActionSelect.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ActionSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/App.vue?vue&type=script&lang=js&":
 /*!******************************************************************!*\
   !*** ./resources/js/components/App.vue?vue&type=script&lang=js& ***!
@@ -32350,6 +32573,23 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VSelect_vue_vue_type_style_index_0_id_e5f47d12_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./VSelect.vue?vue&type=style&index=0&id=e5f47d12&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VSelect.vue?vue&type=style&index=0&id=e5f47d12&scoped=true&lang=css&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ActionSelect.vue?vue&type=template&id=339159bd&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/ActionSelect.vue?vue&type=template&id=339159bd& ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ActionSelect_vue_vue_type_template_id_339159bd___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ActionSelect_vue_vue_type_template_id_339159bd___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ActionSelect_vue_vue_type_template_id_339159bd___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ActionSelect.vue?vue&type=template&id=339159bd& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ActionSelect.vue?vue&type=template&id=339159bd&");
 
 
 /***/ }),
@@ -32830,6 +33070,40 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ActionSelect.vue?vue&type=template&id=339159bd&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ActionSelect.vue?vue&type=template&id=339159bd& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("v-select", {
+    attrs: { options: _vm.options, small: "", placeholder: _vm.placeholder },
+    model: {
+      value: _vm.selectedAction,
+      callback: function($$v) {
+        _vm.selectedAction = $$v
+      },
+      expression: "selectedAction"
+    }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/App.vue?vue&type=template&id=332fccf4&":
 /*!***************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/App.vue?vue&type=template&id=332fccf4& ***!
@@ -33003,116 +33277,105 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card border-0 shadow-sm" }, [
-    _c("div", { staticClass: "card-header bg-white" }, [
-      _c("input", {
-        staticClass: "form-check-input",
-        attrs: {
-          type: "checkbox",
-          title: "Check All " + _vm.resourceInfo.pluralName,
-          "aria-label": "Check All " + _vm.resourceInfo.pluralName
-        }
-      })
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "table-responsive" }, [
+  return _c(
+    "table",
+    {
+      staticClass: "table table-borderless align-middle mb-0",
+      class: { "table-sm": _vm.resourceInfo.smallTable }
+    },
+    [
       _c(
-        "table",
-        {
-          staticClass: "table table-borderless align-middle mb-0",
-          class: { "table-sm": _vm.resourceInfo.smallTable }
-        },
+        "thead",
+        { staticClass: "table-light text-secondary text-uppercase" },
         [
           _c(
-            "thead",
-            { staticClass: "table-light text-secondary text-uppercase" },
+            "tr",
             [
-              _c(
-                "tr",
-                [
-                  _c("th", {
+              _c("th", {
+                class: { "border-end": _vm.resourceInfo.borderedTable },
+                attrs: { scope: "col" }
+              }),
+              _vm._v(" "),
+              _vm._l(_vm.fields, function(field, index) {
+                return _c(
+                  "th",
+                  {
+                    key: index,
                     class: { "border-end": _vm.resourceInfo.borderedTable },
                     attrs: { scope: "col" }
-                  }),
-                  _vm._v(" "),
-                  _vm._l(_vm.fields, function(field, index) {
-                    return _c(
-                      "th",
-                      {
-                        key: index,
-                        class: { "border-end": _vm.resourceInfo.borderedTable },
-                        attrs: { scope: "col" }
-                      },
-                      [
-                        field.sortable
-                          ? [
-                              _c(
-                                "sort-icon",
-                                {
-                                  attrs: {
-                                    attribute: field.attribute,
-                                    sort: _vm.sort,
-                                    order: _vm.order
-                                  },
-                                  on: {
-                                    sort: function($event) {
-                                      return _vm.$emit("sort-resources", $event)
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                " +
-                                      _vm._s(field.name) +
-                                      "\n                            "
-                                  )
-                                ]
+                  },
+                  [
+                    field.sortable
+                      ? [
+                          _c(
+                            "sort-icon",
+                            {
+                              attrs: {
+                                attribute: field.attribute,
+                                sort: _vm.sort,
+                                order: _vm.order
+                              },
+                              on: {
+                                sort: function($event) {
+                                  return _vm.$emit("sort-resources", $event)
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                        " +
+                                  _vm._s(field.name) +
+                                  "\n                    "
                               )
                             ]
-                          : [
-                              _c("span", [
-                                _vm._v(
-                                  "\n                                " +
-                                    _vm._s(field.name) +
-                                    "\n                            "
-                                )
-                              ])
-                            ]
-                      ],
-                      2
-                    )
-                  }),
-                  _vm._v(" "),
-                  _c("th", { attrs: { scope: "col" } })
-                ],
-                2
-              )
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "tbody",
-            _vm._l(_vm.resources, function(resource) {
-              return _c("resources-table-row", {
-                key: resource.id.value,
-                attrs: {
-                  resource: resource,
-                  "resource-key": _vm.resourceKey,
-                  "resource-info": _vm.resourceInfo
-                },
-                on: {
-                  "delete-resource": function($event) {
-                    return _vm.$emit("delete-resource", $event)
-                  }
-                }
-              })
-            }),
-            1
+                          )
+                        ]
+                      : [
+                          _c("span", [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(field.name) +
+                                "\n                    "
+                            )
+                          ])
+                        ]
+                  ],
+                  2
+                )
+              }),
+              _vm._v(" "),
+              _c("th", { attrs: { scope: "col" } })
+            ],
+            2
           )
         ]
+      ),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.resources, function(resource) {
+          return _c("resources-table-row", {
+            key: resource.id.value,
+            attrs: {
+              resource: resource,
+              checked: _vm.checkedResources.includes(resource),
+              "resource-key": _vm.resourceKey,
+              "resource-info": _vm.resourceInfo
+            },
+            on: {
+              check: function($event) {
+                return _vm.$emit("check-resource", $event)
+              },
+              "delete-resource": function($event) {
+                return _vm.$emit("delete-resource", $event)
+              }
+            }
+          })
+        }),
+        1
       )
-    ])
-  ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -33148,7 +33411,9 @@ var render = function() {
             type: "checkbox",
             title: "Check " + _vm.resourceInfo.name,
             "aria-label": "Check " + _vm.resourceInfo.name
-          }
+          },
+          domProps: { checked: _vm.checked },
+          on: { change: _vm.handleCheck }
         })
       ]),
       _vm._v(" "),
@@ -33364,7 +33629,7 @@ var render = function() {
       "button",
       {
         staticClass: "form-select text-start",
-        class: _vm.errorClass,
+        class: [_vm.errorClass, { "form-select-sm": _vm.small }],
         staticStyle: { cursor: "default" },
         attrs: {
           type: "button",
@@ -34121,7 +34386,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _vm.field.value === true
-    ? _c("span", { staticClass: "text-success" }, [
+    ? _c("span", { staticClass: "text-primary" }, [
         _c("i", { staticClass: "far fa-check-circle" })
       ])
     : _c("span", { staticClass: "text-danger" }, [
@@ -34151,7 +34416,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value) + "\n")])
+  return _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value || "-") + "\n")])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34177,8 +34442,8 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _vm.field.asHtml
-    ? _c("span", { domProps: { innerHTML: _vm._s(_vm.field.value) } })
-    : _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value) + "\n")])
+    ? _c("span", { domProps: { innerHTML: _vm._s(_vm.field.value || "-") } })
+    : _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value || "-") + "\n")])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34203,7 +34468,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value) + "\n")])
+  return _c("span", [_vm._v("\n    " + _vm._s(_vm.value || "-") + "\n")])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34229,7 +34494,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _vm.field.value === true
-    ? _c("span", { staticClass: "text-success" }, [
+    ? _c("span", { staticClass: "text-primary" }, [
         _c("i", { staticClass: "far fa-check-circle" })
       ])
     : _c("span", { staticClass: "text-danger" }, [
@@ -34259,7 +34524,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value) + "\n")])
+  return _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value || "-") + "\n")])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34285,8 +34550,8 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _vm.field.asHtml
-    ? _c("span", { domProps: { innerHTML: _vm._s(_vm.field.value) } })
-    : _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value) + "\n")])
+    ? _c("span", { domProps: { innerHTML: _vm._s(_vm.field.value || "-") } })
+    : _c("span", [_vm._v("\n    " + _vm._s(_vm.field.value || "-") + "\n")])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34311,7 +34576,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("\n    " + _vm._s(_vm.field.value) + "\n")])
+  return _c("div", [_vm._v("\n    " + _vm._s(_vm.field.value || "-") + "\n")])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34500,7 +34765,9 @@ var render = function() {
     { staticClass: "container" },
     [
       _c("h4", { staticClass: "mb-4" }, [
-        _vm._v("\n        " + _vm._s(_vm.resourceInfo.pluralLabel) + "\n    ")
+        _vm._v(
+          "\n            " + _vm._s(_vm.resourceInfo.pluralName) + "\n        "
+        )
       ]),
       _vm._v(" "),
       _vm.initialLoading
@@ -34555,9 +34822,9 @@ var render = function() {
                   },
                   [
                     _vm._v(
-                      "\n                Create " +
+                      "\n                    Create " +
                         _vm._s(_vm.resourceInfo.name) +
-                        "\n            "
+                        "\n                "
                     )
                   ]
                 )
@@ -34571,26 +34838,111 @@ var render = function() {
               ? [
                   _c("p", { staticClass: "text-center" }, [
                     _vm._v(
-                      "\n                No " +
+                      "\n                    No " +
                         _vm._s(_vm.resourceInfo.pluralName) +
-                        " Found.\n            "
+                        " Found.\n                "
                     )
                   ])
                 ]
               : [
-                  _c("resources-table", {
-                    attrs: {
-                      sort: _vm.sort,
-                      order: _vm.order,
-                      resources: _vm.resources,
-                      "resource-key": _vm.resourceKey,
-                      "resource-info": _vm.resourceInfo
-                    },
-                    on: {
-                      "sort-resources": _vm.handleSortResources,
-                      "delete-resource": _vm.handleDeleteResource
-                    }
-                  })
+                  _c("div", { staticClass: "card border-0 shadow-sm" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "card-header bg-white d-flex align-items-center justify-content-between"
+                      },
+                      [
+                        _c("input", {
+                          staticClass: "form-check-input",
+                          attrs: {
+                            type: "checkbox",
+                            title: "Check All " + _vm.resourceInfo.pluralName,
+                            "aria-label":
+                              "Check All " + _vm.resourceInfo.pluralName
+                          },
+                          on: { change: _vm.handleCheckAllResources }
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "d-flex align-items-center" },
+                          [
+                            _vm.checkedResources.length && _vm.actions.length
+                              ? _c(
+                                  "div",
+                                  { staticClass: "row row-cols-auto" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "col-12" },
+                                      [
+                                        _c("action-select", {
+                                          attrs: { actions: _vm.actions }
+                                        })
+                                      ],
+                                      1
+                                    )
+                                  ]
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.checkedResources.length
+                              ? _c(
+                                  "a",
+                                  {
+                                    staticClass: "ms-2",
+                                    attrs: {
+                                      href: "",
+                                      role: "button",
+                                      title:
+                                        "Delete Checked " +
+                                        _vm.resourceInfo.pluralName
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        return _vm.handleDeleteResources(
+                                          _vm.checkedResourcesIds
+                                        )
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "far fa-trash-alt" })]
+                                )
+                              : _vm._e()
+                          ]
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "table-responsive" },
+                      [
+                        _c("resources-table", {
+                          attrs: {
+                            sort: _vm.sort,
+                            order: _vm.order,
+                            resources: _vm.resources,
+                            "checked-resources": _vm.checkedResources,
+                            "resource-key": _vm.resourceKey,
+                            "resource-info": _vm.resourceInfo
+                          },
+                          on: {
+                            "check-resource": _vm.handleCheckResource,
+                            "sort-resources": _vm.handleSortResources,
+                            "delete-resource": function($event) {
+                              return _vm.handleDeleteResources([
+                                $event.id.value
+                              ])
+                            }
+                          }
+                        })
+                      ],
+                      1
+                    )
+                  ])
                 ]
           ]
     ],
@@ -34696,7 +35048,7 @@ var render = function() {
                           "dt",
                           {
                             key: "field-name-" + index,
-                            staticClass: "col-sm-2"
+                            staticClass: "col-md-3 col-lg-2"
                           },
                           [
                             _vm._v(
@@ -34711,7 +35063,7 @@ var render = function() {
                           "dd",
                           {
                             key: "field-value-" + index,
-                            staticClass: "col-sm-10"
+                            staticClass: "col-md-9 col-lg-10"
                           },
                           [
                             _c("show-" + field.component, {
@@ -34761,7 +35113,7 @@ var render = function() {
     { staticClass: "container" },
     [
       _c("h4", { staticClass: "mb-4" }, [
-        _vm._v("\n        Edit " + _vm._s(_vm.resourceInfo.label) + "\n    ")
+        _vm._v("\n        Edit " + _vm._s(_vm.resourceInfo.name) + "\n    ")
       ]),
       _vm._v(" "),
       _vm.loading
@@ -34820,7 +35172,7 @@ var render = function() {
                           [
                             _vm._v(
                               "\n                            Edit " +
-                                _vm._s(_vm.resourceInfo.label) +
+                                _vm._s(_vm.resourceInfo.name) +
                                 "\n                        "
                             )
                           ]

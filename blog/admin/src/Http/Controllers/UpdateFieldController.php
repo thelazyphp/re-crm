@@ -22,12 +22,8 @@ class UpdateFieldController extends Controller
             abort(404);
         }
 
-        $model = $resource::$model::findOrFail($resourceId);
-
-        $resource = $resource::forModel($model);
-
         return response()->json([
-            'fields' => $resource->getUpdateFields($request)->values()->all(),
+            'fields' => $resource::forModel($resource::$model::findOrFail($resourceId))->getUpdateFields($request)->values()->all(),
         ]);
     }
 }

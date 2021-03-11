@@ -32,10 +32,8 @@ class ResourceController extends Controller
             );
         }
 
-        $models = $query->get();
-
         return response()->json([
-            'resources' => $models->mapInto($resource)->map->serializeForIndex($request),
+            'resources' => $query->get()->mapInto($resource)->map->serializeForIndex($request),
         ]);
     }
 
@@ -82,12 +80,8 @@ class ResourceController extends Controller
             abort(404);
         }
 
-        $model = $resource::$model::findOrFail($resourceId);
-
-        $resource = $resource::forModel($model);
-
         return response()->json([
-            'resource' => $resource->serializeForShow($request),
+            'resource' => $resource::forModel($resource::$model::findOrFail($resourceId))->serializeForShow($request),
         ]);
     }
 

@@ -1,7 +1,7 @@
 <template>
     <div class="dropdown">
         <button class="form-select text-start"
-                :class="errorClass"
+                :class="[errorClass, { 'form-select-sm': small }]"
                 type="button"
                 style="cursor: default;"
                 data-bs-toggle="dropdown"
@@ -54,6 +54,11 @@ export default {
 
         errorClass: {
             type: Object
+        },
+
+        small: {
+            type: Boolean,
+            default: false
         },
 
         readonly: {

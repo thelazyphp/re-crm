@@ -143,6 +143,15 @@ abstract class Resource implements JsonSerializable
 
     /**
      * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function actions(Request $request)
+    {
+        return [];
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Support\Collection|null  $fields
      * @return array
      */

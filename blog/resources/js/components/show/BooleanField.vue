@@ -1,6 +1,6 @@
 <template>
     <span v-if="field.value === true"
-          class="text-success">
+          class="text-primary">
         <i class="far fa-check-circle"></i>
     </span>
     <span v-else

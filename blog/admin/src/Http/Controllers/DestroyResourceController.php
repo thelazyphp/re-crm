@@ -6,14 +6,14 @@ use Admin\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CreateFieldController extends Controller
+class DestroyResourceController extends Controller
 {
     /**
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $resourceKey
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $resourceKey)
+    public function handle(Request $request, $resourceKey)
     {
         $resource = Admin::findResourceByKey($resourceKey);
 
@@ -21,8 +21,12 @@ class CreateFieldController extends Controller
             abort(404);
         }
 
-        return response()->json([
-            'fields' => (new $resource)->getCreateFields($request)->values()->all(),
-        ]);
+        $resource::$model::destroy(
+            explode(
+                ',', $request->query('resources')
+            )
+        );
+
+        return response(null, 204);
     }
 }

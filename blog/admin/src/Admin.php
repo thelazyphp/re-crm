@@ -66,15 +66,8 @@ abstract class Admin
             'base' => static::path(),
             'locale' => static::locale(),
             'resources' => collect(static::$resources)->map(function ($resource) {
-                return [
-                    'displayInNavigation' => $resource::$displayInNavigation,
-                    'key' => $resource::key(),
-                    'name' => $resource::name(),
-                    'pluralName' => $resource::pluralName(),
-                    'smallTable' => $resource::$smallTable,
-                    'borderedTable' => $resource::$borderedTable,
-                ];
-            })
+                return new $resource;
+            })->values()->all(),
         ];
     }
 

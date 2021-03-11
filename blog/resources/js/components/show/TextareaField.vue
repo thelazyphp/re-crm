@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{ field.value }}
+        {{ field.value || '-' }}
     </div>
 </template>
 
